@@ -1,0 +1,5 @@
+{
+  "def": [true, false, null],
+  "abc": ["abc", 123]
+}
+

@@ -1,0 +1,45 @@
+<p>
+    Each Puppet module should define a <code>metadata.json</code> file that should contain the following keys:
+<ul>
+    <li>name</li>
+    <li>version</li>
+    <li>author</li>
+    <li>license</li>
+    <li>summary</li>
+    <li>source</li>
+    <li>dependencies</li>
+</ul>
+<h2>Noncompliant Code Example</h2>
+Missing <code>author</code> and <code>license</code> keys:
+<pre>
+{
+  "name": "examplecorp-mymodule",
+  "version": "0.0.1",
+  "summary": "A module for a thing",
+  "source": "https://github.com/examplecorp/examplecorp-mymodule",
+  "dependencies": [
+    { "name": "puppetlabs/stdlib", "version_requirement": ">=3.2.0 <5.0.0" },
+    { "name": "puppetlabs/firewall", "version_requirement": ">= 0.0.4" }
+  ]
+}
+</pre>
+<h2>Compliant Solution</h2>
+<pre>
+{
+  "name": "examplecorp-mymodule",
+  "version": "0.0.1",
+  "author": "Pat",
+  "license": "Apache-2.0",
+  "summary": "A module for a thing",
+  "source": "https://github.com/examplecorp/examplecorp-mymodule",
+  "dependencies": [
+    { "name": "puppetlabs/stdlib", "version_requirement": ">=3.2.0 <5.0.0" },
+    { "name": "puppetlabs/firewall", "version_requirement": ">= 0.0.4" }
+  ]
+}
+</pre>
+<h2>See</h2>
+<ul>
+    <li><a href="http://docs.puppetlabs.com/puppet/latest/reference/modules_publishing.html#write-a-metadatajson-file">Puppet
+        Labs documentation - Write a metadata.json File</a></li>
+</ul>
