@@ -20,6 +20,7 @@
 package org.sonar.json.checks;
 
 import com.google.common.collect.ImmutableList;
+import org.sonar.json.checks.puppet.PuppetDeprecatedKeysCheck;
 import org.sonar.json.checks.puppet.PuppetRequiredKeysCheck;
 
 import java.util.Collection;
@@ -36,6 +37,7 @@ public final class CheckList {
     return ImmutableList.<Class>of(
       FileNameCheck.class,
       ParsingErrorCheck.class,
+      PuppetDeprecatedKeysCheck.class,
       PuppetRequiredKeysCheck.class,
       TabCharacterCheck.class
       );

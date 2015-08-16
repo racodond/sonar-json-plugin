@@ -19,13 +19,9 @@
  */
 package org.sonar.json.checks.puppet;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import com.sonar.sslr.api.AstNode;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
@@ -39,48 +35,30 @@ import org.sonar.squidbridge.checks.SquidCheck;
 import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
-  key = "puppet-required-keys",
-  name = "\"metadata.json\" files should define all the required keys",
+  key = "puppet-deprecated-keys",
+  name = "Deprecated keys should be removed from \"metadata.json\" files",
   priority = Priority.MAJOR,
-  tags = {Tags.CONVENTION, Tags.PUPPET})
-@SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
-@SqaleConstantRemediation("10min")
-public class PuppetRequiredKeysCheck extends SquidCheck<LexerlessGrammar> {
-
-  private static final List<String> requiredKeys = ImmutableList.of("name", "version", "author", "license", "summary", "source", "dependencies");
-  private List definedKeys = new ArrayList();
-  private List missingKeys = new ArrayList();
+  tags = {Tags.OBSOLETE, Tags.PUPPET})
+@SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.LANGUAGE_RELATED_PORTABILITY)
+@SqaleConstantRemediation("2min")
+public class PuppetDeprecatedKeysCheck extends SquidCheck<LexerlessGrammar> {
 
   @Override
   public void init() {
-    subscribeTo(JSONGrammar.JSON);
+    subscribeTo(JSONGrammar.KEY);
   }
 
   @Override
   public void visitNode(AstNode node) {
     if (getContext().getFile().getAbsolutePath().endsWith(File.separator + "metadata.json")) {
-      for (AstNode pairNode : node.getFirstChild(JSONGrammar.OBJECT).getChildren(JSONGrammar.PAIR)) {
-        definedKeys.add(CheckUtils.getUnquotedString(pairNode.getFirstChild(JSONGrammar.KEY).getTokenValue()));
+      if ("types".equals(CheckUtils.getUnquotedString(node.getTokenValue()))) {
+        getContext().createLineViolation(this, "Remove this deprecated \"types\" key.", node);
+      } else if ("checksums".equals(CheckUtils.getUnquotedString(node.getTokenValue()))) {
+        getContext().createLineViolation(this, "Remove this deprecated \"checksums\" key.", node);
+      } else if ("description".equals(CheckUtils.getUnquotedString(node.getTokenValue()))) {
+        getContext().createLineViolation(this, "Replace this deprecated \"description\" key by the \"summary\" key.", node);
       }
     }
   }
 
-  @Override
-  public void leaveFile(AstNode node) {
-    if (getContext().getFile().getAbsolutePath().endsWith(File.separator + "metadata.json")) {
-      for (String requiredKey : requiredKeys) {
-        if (!definedKeys.contains(requiredKey)) {
-          missingKeys.add(requiredKey);
-        }
-      }
-      if (!missingKeys.isEmpty()) {
-        getContext().createLineViolation(
-          this,
-          "Add the following keys that are required: " + Joiner.on(", ").join(missingKeys) + ".",
-          node.getFirstChild(JSONGrammar.OBJECT));
-      }
-      definedKeys.clear();
-      missingKeys.clear();
-    }
-  }
 }

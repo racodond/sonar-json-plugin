@@ -68,7 +68,7 @@ public class SyntaxHighlighterVisitorTest {
 
     Mockito.verifyZeroInteractions(highlightable);
   }
-
+// TODO: Fix syntax highlighter tests
 //  @Test
 //  public void test_LF() throws Exception {
 //    this.eol = "\n";

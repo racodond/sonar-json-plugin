@@ -32,7 +32,7 @@ public class TabCharacterCheckTest {
 
   @Test
   public void should_find_tab_characters_and_raise_an_issue() {
-    SourceFile testFile = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/tab-character.json"), check);
+    SourceFile testFile = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/tabCharacter.json"), check);
     CheckMessagesVerifier.verify(testFile.getCheckMessages()).next()
       .withMessage("Replace all tab characters in this file by sequences of whitespaces.")
       .noMore();

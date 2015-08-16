@@ -32,7 +32,7 @@ public class FileNameCheckTest {
 
   @Test
   public void should_follow_the_default_naming_convention_and_not_raise_an_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/tab-character.json"), check);
+    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/tabCharacter.json"), check);
     CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
   }
 
@@ -47,7 +47,7 @@ public class FileNameCheckTest {
   @Test
   public void should_follow_a_custom_naming_convention_and_not_raise_an_issue() {
     check.setFormat("^[a-z][-a-z]+\\.json$");
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/tab-character.json"), check);
+    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/sample.json"), check);
     CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
   }
 

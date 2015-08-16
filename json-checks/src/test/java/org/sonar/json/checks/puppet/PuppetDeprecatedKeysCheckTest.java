@@ -17,7 +17,7 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.json.checks;
+package org.sonar.json.checks.puppet;
 
 import java.io.File;
 
@@ -26,22 +26,18 @@ import org.sonar.json.JSONAstScanner;
 import org.sonar.squidbridge.api.SourceFile;
 import org.sonar.squidbridge.checks.CheckMessagesVerifier;
 
-import static org.hamcrest.Matchers.containsString;
-
-public class ParsingErrorCheckTest {
-
-  private ParsingErrorCheck check = new ParsingErrorCheck();
+public class PuppetDeprecatedKeysCheckTest {
 
   @Test
-  public void should_find_a_parsing_error() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/parsingError.json"), check);
-    CheckMessagesVerifier.verify(file.getCheckMessages()).next().atLine(1).withMessageThat(containsString("Parse error")).noMore();
-  }
-
-  @Test
-  public void should_not_find_any_parsing_error() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/sample.json"), check);
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+  public void should_find_some_deprecated_keys_and_raise_some_issues() {
+    SourceFile file = JSONAstScanner.scanSingleFile(
+      new File("src/test/resources/checks/puppet/deprecated-keys/metadata.json"),
+      new PuppetDeprecatedKeysCheck());
+    CheckMessagesVerifier.verify(file.getCheckMessages())
+      .next().atLine(4).withMessage("Replace this deprecated \"description\" key by the \"summary\" key.")
+      .next().atLine(5).withMessage("Remove this deprecated \"types\" key.")
+      .next().atLine(6).withMessage("Remove this deprecated \"checksums\" key.")
+      .noMore();
   }
 
 }
