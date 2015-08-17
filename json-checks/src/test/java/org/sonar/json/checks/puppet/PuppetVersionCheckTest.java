@@ -17,33 +17,26 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.json.checks;
+package org.sonar.json.checks.puppet;
 
-import com.google.common.collect.ImmutableList;
+import java.io.File;
 
-import java.util.Collection;
+import org.junit.Test;
+import org.sonar.json.JSONAstScanner;
+import org.sonar.squidbridge.api.SourceFile;
+import org.sonar.squidbridge.checks.CheckMessagesVerifier;
 
-import org.sonar.json.checks.puppet.*;
+public class PuppetVersionCheckTest {
 
-public final class CheckList {
-
-  public static final String REPOSITORY_NAME = "SonarQube";
-
-  private CheckList() {
+  @Test
+  public void should_define_some_invalid_versions_and_raise_some_issues() {
+    String message = "Define the version as a semantic version on 3 digits separated by dots: ^\\d+\\.\\d+\\.\\d+$";
+    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/version/metadata.json"), new PuppetVersionCheck());
+    CheckMessagesVerifier.verify(file.getCheckMessages())
+      .next().atLine(4).withMessage(message)
+      .next().atLine(5).withMessage(message)
+      .next().atLine(6).withMessage(message)
+      .noMore();
   }
 
-  @SuppressWarnings("rawtypes")
-  public static Collection<Class> getChecks() {
-    return ImmutableList.<Class>of(
-      FileNameCheck.class,
-      ParsingErrorCheck.class,
-      PuppetDeprecatedKeysCheck.class,
-      PuppetEnforceAuthorValueCheck.class,
-      PuppetEnforceLicenseValueCheck.class,
-      PuppetLicenseCheck.class,
-      PuppetRequiredKeysCheck.class,
-      PuppetVersionCheck.class,
-      TabCharacterCheck.class
-      );
-  }
 }
