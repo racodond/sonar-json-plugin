@@ -39,6 +39,7 @@ import org.sonar.api.batch.rule.Checks;
 import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.measures.FileLinesContext;
 import org.sonar.api.measures.FileLinesContextFactory;
+import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.resources.Project;
 import org.sonar.json.ast.visitors.SonarComponents;
 import org.sonar.squidbridge.SquidAstVisitor;
@@ -70,7 +71,7 @@ public class JSONSquidSensorTest {
     checkFactory = mock(CheckFactory.class);
     when(checkFactory.<SquidAstVisitor>create(Mockito.anyString())).thenReturn(checks);
 
-    sensor = new JSONSquidSensor(null, fs, checkFactory);
+    sensor = new JSONSquidSensor(null, fs, checkFactory, mock(RulesProfile.class));
   }
 
   @Test
@@ -78,7 +79,7 @@ public class JSONSquidSensorTest {
     Project project = new Project("key");
     FileSystem fs = mock(FileSystem.class);
     when(fs.predicates()).thenReturn(mock(FilePredicates.class));
-    JSONSquidSensor cssSensor = new JSONSquidSensor(mock(SonarComponents.class), fs, mock(CheckFactory.class));
+    JSONSquidSensor cssSensor = new JSONSquidSensor(mock(SonarComponents.class), fs, mock(CheckFactory.class), null);
 
     when(fs.files(Mockito.any(FilePredicate.class))).thenReturn(ListUtils.EMPTY_LIST);
     assertThat(cssSensor.shouldExecuteOnProject(project)).isFalse();

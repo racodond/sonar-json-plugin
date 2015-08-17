@@ -57,7 +57,7 @@ public class PuppetRequiredKeysCheck extends SquidCheck<LexerlessGrammar> {
 
   @Override
   public void visitNode(AstNode node) {
-    if (getContext().getFile().getAbsolutePath().endsWith("metadata.json")) {
+    if ("metadata.json".equals(getContext().getFile().getName())) {
       for (AstNode pairNode : node.getFirstChild(JSONGrammar.OBJECT).getChildren(JSONGrammar.PAIR)) {
         definedKeys.add(CheckUtils.getUnquotedString(pairNode.getFirstChild(JSONGrammar.KEY).getTokenValue()));
       }
@@ -66,7 +66,7 @@ public class PuppetRequiredKeysCheck extends SquidCheck<LexerlessGrammar> {
 
   @Override
   public void leaveFile(AstNode node) {
-    if (getContext().getFile().getAbsolutePath().endsWith("metadata.json")) {
+    if ("metadata.json".equals(getContext().getFile().getName())) {
       for (String requiredKey : requiredKeys) {
         if (!definedKeys.contains(requiredKey)) {
           missingKeys.add(requiredKey);

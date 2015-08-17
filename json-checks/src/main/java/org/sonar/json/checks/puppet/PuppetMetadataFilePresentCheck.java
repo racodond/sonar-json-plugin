@@ -20,41 +20,37 @@
 package org.sonar.json.checks.puppet;
 
 import com.sonar.sslr.api.AstNode;
-
-import java.util.regex.Pattern;
-
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
-import org.sonar.json.checks.CheckUtils;
 import org.sonar.json.checks.Tags;
-import org.sonar.json.parser.JSONGrammar;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
 import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
 import org.sonar.squidbridge.checks.SquidCheck;
 import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
-  key = "puppet-version",
-  name = "\"metadata.json\" version should be a semantic version",
+  key = PuppetMetadataFilePresentCheck.RULE_KEY,
+  name = "\"metadata.json\" file should be present",
   priority = Priority.MAJOR,
   tags = {Tags.CONVENTION, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
 @SqaleConstantRemediation("5min")
-public class PuppetVersionCheck extends SquidCheck<LexerlessGrammar> {
+public class PuppetMetadataFilePresentCheck extends SquidCheck<LexerlessGrammar> {
+
+  public static final String RULE_KEY = "puppet-metadata-present";
+
+  private boolean metadataJsonFileFound = false;
 
   @Override
-  public void init() {
-    subscribeTo(JSONGrammar.PAIR);
+  public void visitFile(AstNode node) {
+    if ("metadata.json".equals(getContext().getFile().getName())) {
+      metadataJsonFileFound = true;
+    }
   }
 
-  @Override
-  public void visitNode(AstNode node) {
-    if ("metadata.json".equals(getContext().getFile().getName())
-      && "version".equals(CheckUtils.getUnquotedString(node.getFirstChild(JSONGrammar.KEY).getTokenValue()))
-      && !Pattern.compile("^\\d+\\.\\d+\\.\\d+$").matcher(CheckUtils.getUnquotedString(node.getFirstChild(JSONGrammar.VALUE).getTokenValue())).matches()) {
-      getContext().createLineViolation(this, "Define the version as a semantic version on 3 digits separated by dots: ^\\d+\\.\\d+\\.\\d+$", node.getFirstChild(JSONGrammar.VALUE));
-    }
+  public boolean isMetadataJsonFileFound() {
+    return metadataJsonFileFound;
   }
 
 }

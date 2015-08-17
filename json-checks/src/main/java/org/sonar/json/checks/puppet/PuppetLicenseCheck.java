@@ -78,7 +78,7 @@ public class PuppetLicenseCheck extends SquidCheck<LexerlessGrammar> {
 
   @Override
   public void visitNode(AstNode node) {
-    if (getContext().getFile().getAbsolutePath().endsWith("metadata.json")
+    if ("metadata.json".equals(getContext().getFile().getName())
       && "license".equals(CheckUtils.getUnquotedString(node.getFirstChild(JSONGrammar.KEY).getTokenValue()))) {
       license = CheckUtils.getUnquotedString(node.getFirstChild(JSONGrammar.VALUE).getTokenValue());
       countLicenseKey++;
@@ -87,7 +87,7 @@ public class PuppetLicenseCheck extends SquidCheck<LexerlessGrammar> {
 
   @Override
   public void leaveFile(AstNode node) {
-    if (getContext().getFile().getAbsolutePath().endsWith("metadata.json")) {
+    if ("metadata.json".equals(getContext().getFile().getName())) {
       if (countLicenseKey > 1) {
         getContext().createFileViolation(this, "Several license definitions have been found. Keep only one license definition.");
       } else if (countLicenseKey == 1 && !"proprietary".equals(license) && !availableLicenses.contains(license)) {

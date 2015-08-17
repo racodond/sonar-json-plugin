@@ -47,7 +47,7 @@ public class PuppetDeprecatedKeysCheck extends SquidCheck<LexerlessGrammar> {
 
   @Override
   public void visitNode(AstNode node) {
-    if (getContext().getFile().getAbsolutePath().endsWith("metadata.json")) {
+    if ("metadata.json".equals(getContext().getFile().getName())) {
       if ("types".equals(CheckUtils.getUnquotedString(node.getTokenValue()))) {
         getContext().createLineViolation(this, "Remove this deprecated \"types\" key.", node);
       } else if ("checksums".equals(CheckUtils.getUnquotedString(node.getTokenValue()))) {

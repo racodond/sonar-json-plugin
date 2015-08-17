@@ -57,7 +57,7 @@ public class PuppetEnforceLicenseValueCheck extends SquidCheck<LexerlessGrammar>
 
   @Override
   public void visitNode(AstNode node) {
-    if (getContext().getFile().getAbsolutePath().endsWith("metadata.json")
+    if ("metadata.json".equals(getContext().getFile().getName())
       && "license".equals(CheckUtils.getUnquotedString(node.getFirstChild(JSONGrammar.KEY).getTokenValue()))
       && !license.equals(CheckUtils.getUnquotedString(node.getFirstChild(JSONGrammar.VALUE).getTokenValue()))) {
       getContext().createLineViolation(this, "Set the license to \"" + license + "\".", node.getFirstChild(JSONGrammar.VALUE));

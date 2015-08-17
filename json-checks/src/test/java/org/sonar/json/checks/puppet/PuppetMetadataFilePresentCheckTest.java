@@ -17,34 +17,21 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.json.checks;
+package org.sonar.json.checks.puppet;
 
-import com.google.common.collect.ImmutableList;
+import java.io.File;
 
-import java.util.Collection;
+import org.junit.Test;
+import org.sonar.json.JSONAstScanner;
+import org.sonar.squidbridge.api.SourceFile;
+import org.sonar.squidbridge.checks.CheckMessagesVerifier;
 
-import org.sonar.json.checks.puppet.*;
+public class PuppetMetadataFilePresentCheckTest {
 
-public final class CheckList {
-
-  public static final String REPOSITORY_NAME = "SonarQube";
-
-  private CheckList() {
+  @Test
+  public void should_define_a_valid_license_listed_by_SPDX_and_not_raise_any_issue() {
+    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/sample.json"), new PuppetMetadataFilePresentCheck());
+    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
   }
 
-  @SuppressWarnings("rawtypes")
-  public static Collection<Class> getChecks() {
-    return ImmutableList.<Class>of(
-      FileNameCheck.class,
-      ParsingErrorCheck.class,
-      PuppetDeprecatedKeysCheck.class,
-      PuppetEnforceAuthorValueCheck.class,
-      PuppetEnforceLicenseValueCheck.class,
-      PuppetLicenseCheck.class,
-      PuppetMetadataFilePresentCheck.class,
-      PuppetRequiredKeysCheck.class,
-      PuppetVersionCheck.class,
-      TabCharacterCheck.class
-      );
-  }
 }
