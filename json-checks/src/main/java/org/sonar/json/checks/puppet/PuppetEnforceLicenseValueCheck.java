@@ -19,16 +19,12 @@
  */
 package org.sonar.json.checks.puppet;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
+import com.google.common.annotations.VisibleForTesting;
 import com.sonar.sslr.api.AstNode;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
+import org.sonar.check.RuleProperty;
 import org.sonar.json.checks.CheckUtils;
 import org.sonar.json.checks.Tags;
 import org.sonar.json.parser.JSONGrammar;
@@ -38,48 +34,38 @@ import org.sonar.squidbridge.checks.SquidCheck;
 import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
-  key = "puppet-required-keys",
-  name = "\"metadata.json\" files should define all the required keys",
+  key = "puppet-enforce-license-value",
+  name = "\"metadata.json\" license should match the required value",
   priority = Priority.MAJOR,
   tags = {Tags.CONVENTION, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
-@SqaleConstantRemediation("10min")
-public class PuppetRequiredKeysCheck extends SquidCheck<LexerlessGrammar> {
+@SqaleConstantRemediation("5min")
+public class PuppetEnforceLicenseValueCheck extends SquidCheck<LexerlessGrammar> {
 
-  private static final List<String> requiredKeys = ImmutableList.of("name", "version", "author", "license", "summary", "source", "dependencies");
-  private List definedKeys = new ArrayList();
-  private List missingKeys = new ArrayList();
+  private static final String DEFAULT_LICENSE = "LGPL-3.0";
+
+  @RuleProperty(
+    key = "value",
+    defaultValue = "" + DEFAULT_LICENSE,
+    description = "License to be set")
+  private String license = DEFAULT_LICENSE;
 
   @Override
   public void init() {
-    subscribeTo(JSONGrammar.JSON);
+    subscribeTo(JSONGrammar.PAIR);
   }
 
   @Override
   public void visitNode(AstNode node) {
-    if (getContext().getFile().getAbsolutePath().endsWith("metadata.json")) {
-      for (AstNode pairNode : node.getFirstChild(JSONGrammar.OBJECT).getChildren(JSONGrammar.PAIR)) {
-        definedKeys.add(CheckUtils.getUnquotedString(pairNode.getFirstChild(JSONGrammar.KEY).getTokenValue()));
-      }
+    if (getContext().getFile().getAbsolutePath().endsWith("metadata.json")
+      && "license".equals(CheckUtils.getUnquotedString(node.getFirstChild(JSONGrammar.KEY).getTokenValue()))
+      && !license.equals(CheckUtils.getUnquotedString(node.getFirstChild(JSONGrammar.VALUE).getTokenValue()))) {
+      getContext().createLineViolation(this, "Set the license to \"" + license + "\".", node.getFirstChild(JSONGrammar.VALUE));
     }
   }
 
-  @Override
-  public void leaveFile(AstNode node) {
-    if (getContext().getFile().getAbsolutePath().endsWith("metadata.json")) {
-      for (String requiredKey : requiredKeys) {
-        if (!definedKeys.contains(requiredKey)) {
-          missingKeys.add(requiredKey);
-        }
-      }
-      if (!missingKeys.isEmpty()) {
-        getContext().createLineViolation(
-          this,
-          "Add the following keys that are required: " + Joiner.on(", ").join(missingKeys) + ".",
-          node.getFirstChild(JSONGrammar.OBJECT));
-      }
-      definedKeys.clear();
-      missingKeys.clear();
-    }
+  @VisibleForTesting
+  public void setLicense(String license) {
+    this.license = license;
   }
 }
