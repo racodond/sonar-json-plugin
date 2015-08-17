@@ -20,12 +20,10 @@
 package org.sonar.json.checks;
 
 import com.google.common.collect.ImmutableList;
-import org.sonar.json.checks.puppet.PuppetDeprecatedKeysCheck;
-import org.sonar.json.checks.puppet.PuppetEnforceLicenseValueCheck;
-import org.sonar.json.checks.puppet.PuppetLicenseCheck;
-import org.sonar.json.checks.puppet.PuppetRequiredKeysCheck;
 
 import java.util.Collection;
+
+import org.sonar.json.checks.puppet.*;
 
 public final class CheckList {
 
@@ -40,6 +38,7 @@ public final class CheckList {
       FileNameCheck.class,
       ParsingErrorCheck.class,
       PuppetDeprecatedKeysCheck.class,
+      PuppetEnforceAuthorValueCheck.class,
       PuppetEnforceLicenseValueCheck.class,
       PuppetLicenseCheck.class,
       PuppetRequiredKeysCheck.class,
