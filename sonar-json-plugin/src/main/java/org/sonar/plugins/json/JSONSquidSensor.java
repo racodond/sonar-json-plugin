@@ -31,24 +31,20 @@ import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.InputFile.Type;
 import org.sonar.api.batch.rule.CheckFactory;
 import org.sonar.api.batch.rule.Checks;
-import org.sonar.api.component.Component;
 import org.sonar.api.issue.Issuable;
 import org.sonar.api.issue.Issue;
 import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.resources.Project;
 import org.sonar.api.rule.RuleKey;
-import org.sonar.api.rules.ActiveRule;
 import org.sonar.json.JSONAstScanner;
 import org.sonar.json.JSONConfiguration;
 import org.sonar.json.api.JSONMetric;
 import org.sonar.json.ast.visitors.SonarComponents;
 import org.sonar.json.checks.CheckList;
-import org.sonar.json.checks.puppet.PuppetMetadataFilePresentCheck;
 import org.sonar.squidbridge.AstScanner;
 import org.sonar.squidbridge.SquidAstVisitor;
 import org.sonar.squidbridge.api.CheckMessage;
-import org.sonar.squidbridge.api.CodeVisitor;
 import org.sonar.squidbridge.api.SourceCode;
 import org.sonar.squidbridge.api.SourceFile;
 import org.sonar.squidbridge.indexer.QueryByType;
@@ -104,7 +100,6 @@ public class JSONSquidSensor implements Sensor {
       saveMeasures(sonarFile, squidFile);
       saveIssues(sonarFile, squidFile, checks);
     }
-    saveIssuesOnProject();
   }
 
   private void saveMeasures(InputFile sonarFile, SourceFile squidFile) {
@@ -128,27 +123,6 @@ public class JSONSquidSensor implements Sensor {
             .effortToFix(message.getCost())
             .build();
           issuable.addIssue(issue);
-        }
-      }
-    }
-  }
-
-  private void saveIssuesOnProject() {
-    saveMetadataFilePresentIssues();
-  }
-
-  private void saveMetadataFilePresentIssues() {
-    ActiveRule activeRule = rulesProfile.getActiveRule(JSON.KEY, PuppetMetadataFilePresentCheck.RULE_KEY);
-    if (activeRule != null) {
-      CodeVisitor check = checks.of(activeRule.getRule().ruleKey());
-      if (check != null) {
-        if (!((PuppetMetadataFilePresentCheck) check).isMetadataJsonFileFound()) {
-          Issuable issuable = sonarComponents.getResourcePerspectives().as(Issuable.class, (Component) project);
-          if (issuable != null) {
-            Issue issue = issuable.newIssueBuilder().ruleKey(RuleKey.of(JSON.KEY, PuppetMetadataFilePresentCheck.RULE_KEY))
-              .message("Add a \"metadata.json\" to the root directory of this module.").build();
-            issuable.addIssue(issue);
-          }
         }
       }
     }

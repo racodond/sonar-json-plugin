@@ -23,15 +23,6 @@ import java.io.File;
 
 public class PuppetCheckUtils {
 
-  public static final boolean isInRootDirectory(File file) {
-    for (File otherFiles : file.getParentFile().listFiles()) {
-      if (otherFiles.isDirectory() && "manifests".equals(otherFiles.getName())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   public static final boolean isMetadataJsonFile(File file) {
     return "metadata.json".equals(file.getName());
   }
