@@ -43,7 +43,7 @@ public class JSONProfileTest {
 
     assertThat(profile.getName()).isEqualTo(JSONProfile.SONARQUBE_WAY_PROFILE_NAME);
     assertThat(profile.getLanguage()).isEqualTo(JSON.KEY);
-    assertThat(profile.getActiveRulesByRepository(JSON.KEY)).hasSize(3);
+    assertThat(profile.getActiveRulesByRepository(JSON.KEY)).hasSize(4);
     assertThat(validation.hasErrors()).isFalse();
   }
 

@@ -36,6 +36,7 @@ public final class CheckList {
   public static Collection<Class> getChecks() {
     return ImmutableList.<Class>of(
       FileNameCheck.class,
+      MissingNewLineAtEndOfFileCheck.class,
       ParsingErrorCheck.class,
       PuppetDeprecatedKeysCheck.class,
       PuppetEnforceAuthorValueCheck.class,
