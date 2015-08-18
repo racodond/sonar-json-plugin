@@ -47,7 +47,6 @@ public enum JSONGrammar implements GrammarRuleKey {
   RBRACE,
   COLON,
   COMMA,
-  DOUBLE_QUOTES,
 
   WHITESPACES,
   EOF;
