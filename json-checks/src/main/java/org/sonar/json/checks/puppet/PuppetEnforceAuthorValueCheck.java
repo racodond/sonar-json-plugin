@@ -57,9 +57,9 @@ public class PuppetEnforceAuthorValueCheck extends SquidCheck<LexerlessGrammar> 
 
   @Override
   public void visitNode(AstNode node) {
-    if ("metadata.json".equals(getContext().getFile().getName())
-      && "author".equals(CheckUtils.getUnquotedString(node.getFirstChild(JSONGrammar.KEY).getTokenValue()))
-      && !author.equals(CheckUtils.getUnquotedString(node.getFirstChild(JSONGrammar.VALUE).getTokenValue()))) {
+    if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())
+      && "author".equals(CheckUtils.getKeyNodeValue(node.getFirstChild(JSONGrammar.KEY)))
+      && !author.equals(CheckUtils.getValueNodeStringValue(node.getFirstChild(JSONGrammar.VALUE)))) {
       getContext().createLineViolation(this, "Set the author to \"" + author + "\".", node.getFirstChild(JSONGrammar.VALUE));
     }
   }

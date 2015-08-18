@@ -31,6 +31,7 @@ public class JSONTest extends TestBase {
   @Test
   public void should_match_JSON_file() {
     assertThat(b.rule(JSONGrammar.JSON))
+      .matches("")
       .matches("{}")
       .matches(" {} ")
       .matches(" {   } ")
@@ -47,7 +48,6 @@ public class JSONTest extends TestBase {
   @Test
   public void should_not_match_JSON_file() {
     assertThat(b.rule(JSONGrammar.JSON))
-      .notMatches("")
       .notMatches("abc");
   }
 

@@ -50,9 +50,9 @@ public class PuppetVersionCheck extends SquidCheck<LexerlessGrammar> {
 
   @Override
   public void visitNode(AstNode node) {
-    if ("metadata.json".equals(getContext().getFile().getName())
-      && "version".equals(CheckUtils.getUnquotedString(node.getFirstChild(JSONGrammar.KEY).getTokenValue()))
-      && !Pattern.compile("^\\d+\\.\\d+\\.\\d+$").matcher(CheckUtils.getUnquotedString(node.getFirstChild(JSONGrammar.VALUE).getTokenValue())).matches()) {
+    if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())
+      && "version".equals(CheckUtils.getKeyNodeValue(node.getFirstChild(JSONGrammar.KEY)))
+      && !Pattern.compile("^\\d+\\.\\d+\\.\\d+$").matcher(CheckUtils.getValueNodeStringValue(node.getFirstChild(JSONGrammar.VALUE))).matches()) {
       getContext().createLineViolation(this, "Define the version as a semantic version on 3 digits separated by dots: ^\\d+\\.\\d+\\.\\d+$", node.getFirstChild(JSONGrammar.VALUE));
     }
   }

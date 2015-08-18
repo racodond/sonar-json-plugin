@@ -17,29 +17,23 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.json.checks;
+package org.sonar.json.checks.puppet;
 
-import com.sonar.sslr.api.AstNode;
+import java.io.File;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+public class PuppetCheckUtils {
 
-import org.sonar.json.parser.JSONGrammar;
-
-public final class CheckUtils {
-
-  @Nonnull
-  public static String getKeyNodeValue(@Nonnull AstNode keyNode) {
-    return getUnquotedString(keyNode.getFirstChild(JSONGrammar.STRING).getTokenValue());
+  public static final boolean isInRootDirectory(File file) {
+    for (File otherFiles : file.getParentFile().listFiles()) {
+      if (otherFiles.isDirectory() && "manifests".equals(otherFiles.getName())) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  @Nullable
-  public static String getValueNodeStringValue(@Nonnull AstNode valueNode) {
-    return valueNode.getFirstChild(JSONGrammar.STRING) != null ? getUnquotedString(valueNode.getFirstChild(JSONGrammar.STRING).getTokenValue()) : null;
+  public static final boolean isMetadataJsonFile(File file) {
+    return "metadata.json".equals(file.getName());
   }
 
-  @Nonnull
-  private static String getUnquotedString(@Nonnull String string) {
-    return string.substring(1, string.length() - 1);
-  }
 }

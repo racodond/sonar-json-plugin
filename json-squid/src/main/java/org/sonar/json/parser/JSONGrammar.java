@@ -47,6 +47,7 @@ public enum JSONGrammar implements GrammarRuleKey {
   RBRACE,
   COLON,
   COMMA,
+  DOUBLE_QUOTES,
 
   WHITESPACES,
   EOF;
@@ -59,7 +60,7 @@ public enum JSONGrammar implements GrammarRuleKey {
   }
 
   private static void syntax(LexerlessGrammarBuilder b) {
-    b.rule(JSON).is(OBJECT, EOF);
+    b.rule(JSON).is(b.optional(OBJECT), EOF);
 
     b.rule(OBJECT).is(b.optional(WHITESPACES), LBRACE, b.optional(MEMBERS), RBRACE);
     b.rule(MEMBERS).is(PAIR, b.zeroOrMore(COMMA, PAIR)).skip();

@@ -20,6 +20,7 @@
 package org.sonar.json.checks.puppet;
 
 import com.sonar.sslr.api.AstNode;
+import org.hibernate.annotations.Check;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
@@ -47,12 +48,12 @@ public class PuppetDeprecatedKeysCheck extends SquidCheck<LexerlessGrammar> {
 
   @Override
   public void visitNode(AstNode node) {
-    if ("metadata.json".equals(getContext().getFile().getName())) {
-      if ("types".equals(CheckUtils.getUnquotedString(node.getTokenValue()))) {
+    if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())) {
+      if ("types".equals(CheckUtils.getKeyNodeValue(node))) {
         getContext().createLineViolation(this, "Remove this deprecated \"types\" key.", node);
-      } else if ("checksums".equals(CheckUtils.getUnquotedString(node.getTokenValue()))) {
+      } else if ("checksums".equals(CheckUtils.getKeyNodeValue(node))) {
         getContext().createLineViolation(this, "Remove this deprecated \"checksums\" key.", node);
-      } else if ("description".equals(CheckUtils.getUnquotedString(node.getTokenValue()))) {
+      } else if ("description".equals(CheckUtils.getKeyNodeValue(node))) {
         getContext().createLineViolation(this, "Replace this deprecated \"description\" key by the \"summary\" key.", node);
       }
     }

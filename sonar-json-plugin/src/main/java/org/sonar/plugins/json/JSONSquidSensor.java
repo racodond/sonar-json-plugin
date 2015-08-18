@@ -146,7 +146,7 @@ public class JSONSquidSensor implements Sensor {
           Issuable issuable = sonarComponents.getResourcePerspectives().as(Issuable.class, (Component) project);
           if (issuable != null) {
             Issue issue = issuable.newIssueBuilder().ruleKey(RuleKey.of(JSON.KEY, PuppetMetadataFilePresentCheck.RULE_KEY))
-              .message("Add a \"metadata.json\" to this project.").build();
+              .message("Add a \"metadata.json\" to the root directory of this module.").build();
             issuable.addIssue(issue);
           }
         }

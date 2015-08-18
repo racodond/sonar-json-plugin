@@ -20,6 +20,9 @@
 package org.sonar.json.checks.puppet;
 
 import com.sonar.sslr.api.AstNode;
+
+import java.io.File;
+
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
@@ -44,7 +47,8 @@ public class PuppetMetadataFilePresentCheck extends SquidCheck<LexerlessGrammar>
 
   @Override
   public void visitFile(AstNode node) {
-    if ("metadata.json".equals(getContext().getFile().getName())) {
+    File file = getContext().getFile();
+    if (PuppetCheckUtils.isMetadataJsonFile(file) && PuppetCheckUtils.isInRootDirectory(file)) {
       metadataJsonFileFound = true;
     }
   }

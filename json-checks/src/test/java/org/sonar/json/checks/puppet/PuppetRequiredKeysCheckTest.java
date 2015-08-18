@@ -40,7 +40,15 @@ public class PuppetRequiredKeysCheckTest {
   public void should_not_define_some_keys_and_raise_an_issue() {
     SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/required-keys/missing-keys/metadata.json"), check);
     CheckMessagesVerifier.verify(file.getCheckMessages()).next()
-      .atLine(1).withMessage("Add the following keys that are required: author, license.")
+      .withMessage("Add the following keys that are required: author, license.")
+      .noMore();
+  }
+
+  @Test
+  public void should_be_an_empty_file_and_raise_an_issue() {
+    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/required-keys/empty-file/metadata.json"), check);
+    CheckMessagesVerifier.verify(file.getCheckMessages()).next()
+      .withMessage("Add the following keys that are required: name, version, author, license, summary, source, dependencies.")
       .noMore();
   }
 

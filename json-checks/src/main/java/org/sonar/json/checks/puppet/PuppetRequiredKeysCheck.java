@@ -57,26 +57,23 @@ public class PuppetRequiredKeysCheck extends SquidCheck<LexerlessGrammar> {
 
   @Override
   public void visitNode(AstNode node) {
-    if ("metadata.json".equals(getContext().getFile().getName())) {
+    if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile()) && node.getFirstChild(JSONGrammar.OBJECT) != null) {
       for (AstNode pairNode : node.getFirstChild(JSONGrammar.OBJECT).getChildren(JSONGrammar.PAIR)) {
-        definedKeys.add(CheckUtils.getUnquotedString(pairNode.getFirstChild(JSONGrammar.KEY).getTokenValue()));
+        definedKeys.add(CheckUtils.getKeyNodeValue(pairNode.getFirstChild(JSONGrammar.KEY)));
       }
     }
   }
 
   @Override
   public void leaveFile(AstNode node) {
-    if ("metadata.json".equals(getContext().getFile().getName())) {
+    if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())) {
       for (String requiredKey : requiredKeys) {
         if (!definedKeys.contains(requiredKey)) {
           missingKeys.add(requiredKey);
         }
       }
       if (!missingKeys.isEmpty()) {
-        getContext().createLineViolation(
-          this,
-          "Add the following keys that are required: " + Joiner.on(", ").join(missingKeys) + ".",
-          node.getFirstChild(JSONGrammar.OBJECT));
+        getContext().createFileViolation(this, "Add the following keys that are required: " + Joiner.on(", ").join(missingKeys) + ".");
       }
       definedKeys.clear();
       missingKeys.clear();
