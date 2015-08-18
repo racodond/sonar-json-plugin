@@ -35,7 +35,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
   key = "puppet-enforce-author-value",
-  name = "\"metadata.json\" author should match the required value",
+  name = "\"author\" should match the required value in Puppet \"metadata.json\" files",
   priority = Priority.MAJOR,
   tags = {Tags.CONVENTION, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)

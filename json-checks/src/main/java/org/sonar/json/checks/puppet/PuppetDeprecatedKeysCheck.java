@@ -34,11 +34,11 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
   key = "puppet-deprecated-keys",
-  name = "Deprecated keys should be removed from \"metadata.json\" files",
+  name = "Deprecated keys should be removed from Puppet \"metadata.json\" files",
   priority = Priority.MAJOR,
   tags = {Tags.OBSOLETE, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.LANGUAGE_RELATED_PORTABILITY)
-@SqaleConstantRemediation("2min")
+@SqaleConstantRemediation("5min")
 public class PuppetDeprecatedKeysCheck extends SquidCheck<LexerlessGrammar> {
 
   @Override

@@ -34,11 +34,11 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
   key = PuppetMetadataFilePresentCheck.RULE_KEY,
-  name = "\"metadata.json\" file should be present",
+  name = "Each Puppet module should contain a \"metadata.json\" file",
   priority = Priority.MAJOR,
   tags = {Tags.CONVENTION, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
-@SqaleConstantRemediation("5min")
+@SqaleConstantRemediation("15min")
 public class PuppetMetadataFilePresentCheck extends SquidCheck<LexerlessGrammar> {
 
   public static final String RULE_KEY = "puppet-metadata-present";

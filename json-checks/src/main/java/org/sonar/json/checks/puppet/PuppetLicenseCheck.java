@@ -37,7 +37,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
   key = "puppet-license",
-  name = "\"metadata.json\" license value should be valid",
+  name = "\"license\" should be valid in Puppet \"metadata.json\" files",
   priority = Priority.MAJOR,
   tags = {Tags.CONVENTION, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)

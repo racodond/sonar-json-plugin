@@ -36,7 +36,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
   key = "puppet-version",
-  name = "\"metadata.json\" version should be a semantic version",
+  name = "\"version\" should be a semantic version in Puppet \"metadata.json\" files",
   priority = Priority.MAJOR,
   tags = {Tags.CONVENTION, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)

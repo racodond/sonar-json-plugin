@@ -39,7 +39,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
   key = "puppet-required-keys",
-  name = "\"metadata.json\" files should define all the required keys",
+  name = "Puppet \"metadata.json\" files should define all the required keys",
   priority = Priority.MAJOR,
   tags = {Tags.CONVENTION, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
