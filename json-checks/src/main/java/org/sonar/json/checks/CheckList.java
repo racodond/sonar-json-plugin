@@ -43,7 +43,6 @@ public final class CheckList {
       PuppetEnforceAuthorValueCheck.class,
       PuppetEnforceLicenseValueCheck.class,
       PuppetLicenseCheck.class,
-      PuppetMetadataFilePresentCheck.class,
       PuppetRequiredKeysCheck.class,
       PuppetVersionCheck.class,
       TabCharacterCheck.class
