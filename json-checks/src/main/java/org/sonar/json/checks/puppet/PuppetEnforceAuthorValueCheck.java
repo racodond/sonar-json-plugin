@@ -25,13 +25,12 @@ import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.check.RuleProperty;
+import org.sonar.json.JSONCheck;
 import org.sonar.json.checks.CheckUtils;
 import org.sonar.json.checks.Tags;
 import org.sonar.json.parser.JSONGrammar;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
 import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
-import org.sonar.squidbridge.checks.SquidCheck;
-import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
   key = "puppet-enforce-author-value",
@@ -40,7 +39,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
   tags = {Tags.CONVENTION, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
 @SqaleConstantRemediation("5min")
-public class PuppetEnforceAuthorValueCheck extends SquidCheck<LexerlessGrammar> {
+public class PuppetEnforceAuthorValueCheck extends JSONCheck {
 
   private static final String DEFAULT_AUTHOR = "John Doe";
 
@@ -60,7 +59,7 @@ public class PuppetEnforceAuthorValueCheck extends SquidCheck<LexerlessGrammar> 
     if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())
       && "author".equals(CheckUtils.getKeyNodeValue(node.getFirstChild(JSONGrammar.KEY)))
       && !author.equals(CheckUtils.getValueNodeStringValue(node.getFirstChild(JSONGrammar.VALUE)))) {
-      getContext().createLineViolation(this, "Set the author to \"" + author + "\".", node.getFirstChild(JSONGrammar.VALUE));
+      addIssue(node.getFirstChild(JSONGrammar.VALUE), this, "Set the author to \"" + author + "\".");
     }
   }
 

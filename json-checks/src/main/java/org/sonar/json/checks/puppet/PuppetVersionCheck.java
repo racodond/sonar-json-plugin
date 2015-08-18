@@ -26,13 +26,12 @@ import java.util.regex.Pattern;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
+import org.sonar.json.JSONCheck;
 import org.sonar.json.checks.CheckUtils;
 import org.sonar.json.checks.Tags;
 import org.sonar.json.parser.JSONGrammar;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
 import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
-import org.sonar.squidbridge.checks.SquidCheck;
-import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
   key = "puppet-version",
@@ -41,7 +40,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
   tags = {Tags.CONVENTION, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
 @SqaleConstantRemediation("5min")
-public class PuppetVersionCheck extends SquidCheck<LexerlessGrammar> {
+public class PuppetVersionCheck extends JSONCheck {
 
   @Override
   public void init() {
@@ -53,7 +52,7 @@ public class PuppetVersionCheck extends SquidCheck<LexerlessGrammar> {
     if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())
       && "version".equals(CheckUtils.getKeyNodeValue(node.getFirstChild(JSONGrammar.KEY)))
       && !Pattern.compile("^\\d+\\.\\d+\\.\\d+$").matcher(CheckUtils.getValueNodeStringValue(node.getFirstChild(JSONGrammar.VALUE))).matches()) {
-      getContext().createLineViolation(this, "Define the version as a semantic version on 3 digits separated by dots: ^\\d+\\.\\d+\\.\\d+$", node.getFirstChild(JSONGrammar.VALUE));
+      addIssue(node.getFirstChild(JSONGrammar.VALUE), this, "Define the version as a semantic version on 3 digits separated by dots: ^\\d+\\.\\d+\\.\\d+$");
     }
   }
 

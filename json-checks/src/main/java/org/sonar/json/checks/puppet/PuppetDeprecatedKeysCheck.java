@@ -20,17 +20,15 @@
 package org.sonar.json.checks.puppet;
 
 import com.sonar.sslr.api.AstNode;
-import org.hibernate.annotations.Check;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
+import org.sonar.json.JSONCheck;
 import org.sonar.json.checks.CheckUtils;
 import org.sonar.json.checks.Tags;
 import org.sonar.json.parser.JSONGrammar;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
 import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
-import org.sonar.squidbridge.checks.SquidCheck;
-import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
   key = "puppet-deprecated-keys",
@@ -39,7 +37,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
   tags = {Tags.OBSOLETE, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.LANGUAGE_RELATED_PORTABILITY)
 @SqaleConstantRemediation("5min")
-public class PuppetDeprecatedKeysCheck extends SquidCheck<LexerlessGrammar> {
+public class PuppetDeprecatedKeysCheck extends JSONCheck {
 
   @Override
   public void init() {
@@ -50,11 +48,11 @@ public class PuppetDeprecatedKeysCheck extends SquidCheck<LexerlessGrammar> {
   public void visitNode(AstNode node) {
     if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())) {
       if ("types".equals(CheckUtils.getKeyNodeValue(node))) {
-        getContext().createLineViolation(this, "Remove this deprecated \"types\" key.", node);
+        addIssue(node, this, "Remove this deprecated \"types\" key.");
       } else if ("checksums".equals(CheckUtils.getKeyNodeValue(node))) {
-        getContext().createLineViolation(this, "Remove this deprecated \"checksums\" key.", node);
+        addIssue(node, this, "Remove this deprecated \"checksums\" key.");
       } else if ("description".equals(CheckUtils.getKeyNodeValue(node))) {
-        getContext().createLineViolation(this, "Replace this deprecated \"description\" key by the \"summary\" key.", node);
+        addIssue(node, this, "Replace this deprecated \"description\" key by the \"summary\" key.");
       }
     }
   }

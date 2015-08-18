@@ -29,13 +29,12 @@ import java.util.List;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
+import org.sonar.json.JSONCheck;
 import org.sonar.json.checks.CheckUtils;
 import org.sonar.json.checks.Tags;
 import org.sonar.json.parser.JSONGrammar;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
 import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
-import org.sonar.squidbridge.checks.SquidCheck;
-import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
   key = "puppet-required-keys",
@@ -44,7 +43,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
   tags = {Tags.CONVENTION, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
 @SqaleConstantRemediation("10min")
-public class PuppetRequiredKeysCheck extends SquidCheck<LexerlessGrammar> {
+public class PuppetRequiredKeysCheck extends JSONCheck {
 
   private static final List<String> requiredKeys = ImmutableList.of("name", "version", "author", "license", "summary", "source", "dependencies");
   private List definedKeys = new ArrayList();
@@ -73,7 +72,7 @@ public class PuppetRequiredKeysCheck extends SquidCheck<LexerlessGrammar> {
         }
       }
       if (!missingKeys.isEmpty()) {
-        getContext().createFileViolation(this, "Add the following keys that are required: " + Joiner.on(", ").join(missingKeys) + ".");
+        addIssueOnFile(this, "Add the following keys that are required: " + Joiner.on(", ").join(missingKeys) + ".");
       }
       definedKeys.clear();
       missingKeys.clear();

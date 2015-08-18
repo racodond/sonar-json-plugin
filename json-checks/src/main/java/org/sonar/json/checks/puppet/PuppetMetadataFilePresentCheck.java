@@ -26,11 +26,10 @@ import java.io.File;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
+import org.sonar.json.JSONCheck;
 import org.sonar.json.checks.Tags;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
 import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
-import org.sonar.squidbridge.checks.SquidCheck;
-import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
   key = PuppetMetadataFilePresentCheck.RULE_KEY,
@@ -39,7 +38,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
   tags = {Tags.CONVENTION, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
 @SqaleConstantRemediation("15min")
-public class PuppetMetadataFilePresentCheck extends SquidCheck<LexerlessGrammar> {
+public class PuppetMetadataFilePresentCheck extends JSONCheck {
 
   public static final String RULE_KEY = "puppet-metadata-present";
 

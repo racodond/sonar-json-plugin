@@ -25,13 +25,12 @@ import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.check.RuleProperty;
+import org.sonar.json.JSONCheck;
 import org.sonar.json.checks.CheckUtils;
 import org.sonar.json.checks.Tags;
 import org.sonar.json.parser.JSONGrammar;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
 import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
-import org.sonar.squidbridge.checks.SquidCheck;
-import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
   key = "puppet-enforce-license-value",
@@ -40,7 +39,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
   tags = {Tags.CONVENTION, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
 @SqaleConstantRemediation("5min")
-public class PuppetEnforceLicenseValueCheck extends SquidCheck<LexerlessGrammar> {
+public class PuppetEnforceLicenseValueCheck extends JSONCheck {
 
   private static final String DEFAULT_LICENSE = "LGPL-3.0";
 
@@ -60,7 +59,7 @@ public class PuppetEnforceLicenseValueCheck extends SquidCheck<LexerlessGrammar>
     if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())
       && "license".equals(CheckUtils.getKeyNodeValue(node.getFirstChild(JSONGrammar.KEY)))
       && !license.equals(CheckUtils.getValueNodeStringValue(node.getFirstChild(JSONGrammar.VALUE)))) {
-      getContext().createLineViolation(this, "Set the license to \"" + license + "\".", node.getFirstChild(JSONGrammar.VALUE));
+      addIssue(node.getFirstChild(JSONGrammar.VALUE), this, "Set the license to \"" + license + "\".");
     }
   }
 

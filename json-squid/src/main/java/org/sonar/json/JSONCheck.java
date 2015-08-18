@@ -33,7 +33,7 @@ import org.sonar.squidbridge.api.CodeCheck;
 import org.sonar.squidbridge.api.SourceFile;
 import org.sonar.squidbridge.checks.SquidCheck;
 
-public class JSONCheckVisitor extends SquidCheck {
+public class JSONCheck extends SquidCheck {
 
   public void addIssue(AstNode node, CodeCheck check, String message) {
     addIssue(node.getTokenLine(), check, message, null);

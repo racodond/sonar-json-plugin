@@ -27,13 +27,12 @@ import java.util.List;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
+import org.sonar.json.JSONCheck;
 import org.sonar.json.checks.CheckUtils;
 import org.sonar.json.checks.Tags;
 import org.sonar.json.parser.JSONGrammar;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
 import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
-import org.sonar.squidbridge.checks.SquidCheck;
-import org.sonar.sslr.parser.LexerlessGrammar;
 
 @Rule(
   key = "puppet-license",
@@ -42,7 +41,7 @@ import org.sonar.sslr.parser.LexerlessGrammar;
   tags = {Tags.CONVENTION, Tags.PUPPET})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
 @SqaleConstantRemediation("5min")
-public class PuppetLicenseCheck extends SquidCheck<LexerlessGrammar> {
+public class PuppetLicenseCheck extends JSONCheck {
 
   private static final List<String> availableLicenses = ImmutableList.of("Glide", "Abstyles", "AFL-1.1", "AFL-1.2", "AFL-2.0", "AFL-2.1", "AFL-3.0", "AMPAS", "APL-1.0",
     "Adobe-Glyph", "APAFML", "Adobe-2006", "AGPL-1.0", "Afmparse", "Aladdin", "ADSL", "AMDPLPA", "ANTLR-PD", "Apache-1.0", "Apache-1.1", "Apache-2.0", "AML", "APSL-1.0",
@@ -89,9 +88,9 @@ public class PuppetLicenseCheck extends SquidCheck<LexerlessGrammar> {
   public void leaveFile(AstNode node) {
     if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())) {
       if (countLicenseKey > 1) {
-        getContext().createFileViolation(this, "Several license definitions have been found. Keep only one license definition.");
+        addIssueOnFile(this, "Several license definitions have been found. Keep only one license definition.");
       } else if (countLicenseKey == 1 && !"proprietary".equals(license) && !availableLicenses.contains(license)) {
-        getContext().createFileViolation(this, "License \"" + license + "\" is not a valid license. Define a valid license.");
+        addIssueOnFile(this, "License \"" + license + "\" is not a valid license. Define a valid license.");
       }
       license = "invalid";
       countLicenseKey = 0;
