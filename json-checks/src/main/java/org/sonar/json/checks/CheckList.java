@@ -39,6 +39,7 @@ public final class CheckList {
       MissingNewLineAtEndOfFileCheck.class,
       ParsingErrorCheck.class,
       PuppetDeprecatedKeysCheck.class,
+      PuppetDuplicatedDependenciesCheck.class,
       PuppetEnforceAuthorValueCheck.class,
       PuppetEnforceLicenseValueCheck.class,
       PuppetLicenseCheck.class,

@@ -1,0 +1,37 @@
+<p>
+    This rule checks for duplicated dependency entries in Puppet <code>metadata.json</code> files. Those duplicated
+    dependencies must be removed.
+</p>
+<h2>Noncompliant Code Example</h2>
+<pre>
+{
+  ...
+  "dependencies": [
+    { "name": "puppetlabs/stdlib", "version_requirement": ">=3.2.0 <5.0.0" },
+    { "name": "puppetlabs/firewall", "version_requirement": ">= 0.0.4" },
+    { "name": "puppetlabs/apt", "version_requirement": ">=1.1.0 <2.0.0" },
+    { "name": "puppetlabs/stdlib", "version_requirement": ">=4.2.0" }    # Noncompliant: Duplicated dependency
+  ]
+  ...
+}
+</pre>
+
+<h2>Compliant Solution</h2>
+<pre>
+{
+  ...
+  "dependencies": [
+    { "name": "puppetlabs/stdlib", "version_requirement": ">=3.2.0 <5.0.0" },
+    { "name": "puppetlabs/firewall", "version_requirement": ">= 0.0.4" },
+    { "name": "puppetlabs/apt", "version_requirement": ">=1.1.0 <2.0.0" }
+  ]
+  ...
+}
+</pre>
+
+<h2>See</h2>
+<ul>
+    <li>
+        <a href="https://docs.puppetlabs.com/puppet/latest/reference/modules_publishing.html#dependencies-in-metadatajson">Puppet
+            Labs documentation - Write a metadata.json File</a></li>
+</ul>
