@@ -26,6 +26,8 @@ import org.sonar.json.JSONAstScanner;
 import org.sonar.squidbridge.api.SourceFile;
 import org.sonar.squidbridge.checks.CheckMessagesVerifier;
 
+import static org.hamcrest.Matchers.containsString;
+
 public class PuppetDuplicatedDependenciesCheckTest {
 
   @Test
@@ -60,8 +62,8 @@ public class PuppetDuplicatedDependenciesCheckTest {
       new File("src/test/resources/checks/puppet/dependencies/duplicated-dependencies/metadata.json"),
       new PuppetDuplicatedDependenciesCheck());
     CheckMessagesVerifier.verify(file.getCheckMessages())
-      .next().atLine(21).withMessage("Remove the duplicated dependencies: puppetlabs/firewall, puppetlabs/stdlib.").
-      noMore();
+      .next().atLine(21).withMessageThat(containsString("Remove the duplicated dependencies:"))
+      .noMore();
   }
 
 }
