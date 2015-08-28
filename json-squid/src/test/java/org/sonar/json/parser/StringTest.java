@@ -38,7 +38,12 @@ public class StringTest extends TestBase {
       .matches("\"aa\\\\aa\"")
       .matches("\"aa\\\"aa\"")
       .matches("\"aa\\\"a\na\"")
-      .matches("\"aa\\\"a\na\"");
+      .matches("\"aa\\\"a\na\"")
+      .matches("\"\\\\\"")
+      .matches("\"\\r\"")
+      .matches("\"\\u1A3F\"")
+      .matches("\"/\"")
+      .matches("\"\\/\"");
   }
 
   @Test
@@ -47,8 +52,10 @@ public class StringTest extends TestBase {
       .notMatches("123")
       .notMatches("12\\3")
       .notMatches("12\"3")
-      .notMatches("\"12\"3\"");
-    // .notMatches("\"12\\3\"");
+      .notMatches("\"12\"3\"")
+      .notMatches("\"12\\3\"")
+      .notMatches("\"\\\"")
+      .notMatches("\"\\u13F\"");
   }
 
 }
