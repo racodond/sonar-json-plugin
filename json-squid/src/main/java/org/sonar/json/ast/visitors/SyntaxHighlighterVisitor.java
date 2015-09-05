@@ -93,14 +93,6 @@ public class SyntaxHighlighterVisitor extends SquidAstVisitor<LexerlessGrammar> 
     highlighting.highlight(astNode.getFromIndex(), astNode.getToIndex(), TYPES.get(astNode.getType()));
   }
 
-  /**
-   * @param line starts from 1
-   * @param column starts from 0
-   */
-  private int getOffset(int line, int column) {
-    return lineStart.get(line - 1) + column;
-  }
-
   @Override
   public void leaveFile(AstNode astNode) {
     if (astNode == null) {
