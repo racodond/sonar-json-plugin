@@ -41,7 +41,12 @@ import org.sonar.sslr.parser.LexerlessGrammar;
 public class SyntaxHighlighterVisitor extends SquidAstVisitor<LexerlessGrammar> {
 
   private static final Map<AstNodeType, String> TYPES = ImmutableMap.<AstNodeType, String>builder()
-    .put(JSONGrammar.KEY, "c")
+    .put(JSONGrammar.KEY, "k")
+    .put(JSONGrammar.STRING, "p")
+    .put(JSONGrammar.TRUE, "c")
+    .put(JSONGrammar.FALSE, "c")
+    .put(JSONGrammar.NULL, "c")
+    .put(JSONGrammar.NUMBER, "c")
     .build();
 
   private final SonarComponents sonarComponents;

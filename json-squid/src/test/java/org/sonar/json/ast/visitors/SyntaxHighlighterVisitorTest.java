@@ -78,8 +78,16 @@ public class SyntaxHighlighterVisitorTest {
     JSONAstScanner.scanSingleFile(file, syntaxHighlighterVisitor);
     lines = Files.readLines(file, Charsets.UTF_8);
 
-    Mockito.verify(highlighting).highlight(offset(2, 3), offset(2, 8), "c");
-    Mockito.verify(highlighting).highlight(offset(3, 3), offset(3, 9), "c");
+    Mockito.verify(highlighting).highlight(offset(2, 3), offset(2, 8), "k");
+    Mockito.verify(highlighting).highlight(offset(2, 3), offset(2, 8), "p");
+    Mockito.verify(highlighting).highlight(offset(2, 11), offset(2, 15), "c");
+    Mockito.verify(highlighting).highlight(offset(2, 17), offset(2, 22), "c");
+    Mockito.verify(highlighting).highlight(offset(2, 24), offset(2, 28), "c");
+    Mockito.verify(highlighting).highlight(offset(3, 3), offset(3, 9), "k");
+    Mockito.verify(highlighting).highlight(offset(3, 3), offset(3, 9), "p");
+    Mockito.verify(highlighting).highlight(offset(3, 12), offset(3, 18), "p");
+    Mockito.verify(highlighting).highlight(offset(3, 20), offset(3, 23), "c");
+    Mockito.verify(highlighting).highlight(offset(3, 25), offset(3, 30), "c");
     Mockito.verify(highlighting).done();
     Mockito.verifyNoMoreInteractions(highlighting);
   }
@@ -93,8 +101,16 @@ public class SyntaxHighlighterVisitorTest {
     JSONAstScanner.scanSingleFile(file, syntaxHighlighterVisitor);
     lines = Files.readLines(file, Charsets.UTF_8);
 
-    Mockito.verify(highlighting).highlight(offset(2, 3), offset(2, 8), "c");
-    Mockito.verify(highlighting).highlight(offset(3, 3), offset(3, 9), "c");
+    Mockito.verify(highlighting).highlight(offset(2, 3), offset(2, 8), "k");
+    Mockito.verify(highlighting).highlight(offset(2, 3), offset(2, 8), "p");
+    Mockito.verify(highlighting).highlight(offset(2, 11), offset(2, 15), "c");
+    Mockito.verify(highlighting).highlight(offset(2, 17), offset(2, 22), "c");
+    Mockito.verify(highlighting).highlight(offset(2, 24), offset(2, 28), "c");
+    Mockito.verify(highlighting).highlight(offset(3, 3), offset(3, 9), "k");
+    Mockito.verify(highlighting).highlight(offset(3, 3), offset(3, 9), "p");
+    Mockito.verify(highlighting).highlight(offset(3, 12), offset(3, 18), "p");
+    Mockito.verify(highlighting).highlight(offset(3, 20), offset(3, 23), "c");
+    Mockito.verify(highlighting).highlight(offset(3, 25), offset(3, 30), "c");
     Mockito.verify(highlighting).done();
     Mockito.verifyNoMoreInteractions(highlighting);
   }
@@ -108,8 +124,16 @@ public class SyntaxHighlighterVisitorTest {
     JSONAstScanner.scanSingleFile(file, syntaxHighlighterVisitor);
     lines = Files.readLines(file, Charsets.UTF_8);
 
-    Mockito.verify(highlighting).highlight(offset(2, 3), offset(2, 8), "c");
-    Mockito.verify(highlighting).highlight(offset(3, 3), offset(3, 9), "c");
+    Mockito.verify(highlighting).highlight(offset(2, 3), offset(2, 8), "k");
+    Mockito.verify(highlighting).highlight(offset(2, 3), offset(2, 8), "p");
+    Mockito.verify(highlighting).highlight(offset(2, 11), offset(2, 15), "c");
+    Mockito.verify(highlighting).highlight(offset(2, 17), offset(2, 22), "c");
+    Mockito.verify(highlighting).highlight(offset(2, 24), offset(2, 28), "c");
+    Mockito.verify(highlighting).highlight(offset(3, 3), offset(3, 9), "k");
+    Mockito.verify(highlighting).highlight(offset(3, 3), offset(3, 9), "p");
+    Mockito.verify(highlighting).highlight(offset(3, 12), offset(3, 18), "p");
+    Mockito.verify(highlighting).highlight(offset(3, 20), offset(3, 23), "c");
+    Mockito.verify(highlighting).highlight(offset(3, 25), offset(3, 30), "c");
     Mockito.verify(highlighting).done();
     Mockito.verifyNoMoreInteractions(highlighting);
   }
