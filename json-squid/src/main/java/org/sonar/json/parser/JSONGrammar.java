@@ -74,8 +74,6 @@ public enum JSONGrammar implements GrammarRuleKey {
     b.rule(FALSE).is("false");
     b.rule(NULL).is("null");
     b.rule(NUMBER).is(b.regexp("[-]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?"));
-
-    // TODO: Check this regular expression, for example \ should not be allowed by itself
     b.rule(STRING).is(b.regexp("\"([^\"\\\\]|\\\\\\\\|\\\\\"|\\\\/|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\u[0-9a-fA-F]{4})*\""));
 
     b.rule(COMMA).is(",");
