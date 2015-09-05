@@ -55,4 +55,9 @@ public class JSONAstScannerTest {
     assertThat(file.getInt(JSONMetric.CLASSES)).isEqualTo(3);
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void file_not_found() {
+    JSONAstScanner.scanSingleFile(new File("blabla"));
+  }
+
 }

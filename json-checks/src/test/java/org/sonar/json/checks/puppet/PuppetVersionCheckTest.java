@@ -39,4 +39,10 @@ public class PuppetVersionCheckTest {
       .noMore();
   }
 
+  @Test
+  public void should_not_raise_any_issues_because_it_is_not_a_metadat_json_file() {
+    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/version/notmetadata.json"), new PuppetVersionCheck());
+    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+  }
+
 }

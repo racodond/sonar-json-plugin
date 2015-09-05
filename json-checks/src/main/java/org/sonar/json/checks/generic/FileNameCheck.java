@@ -17,59 +17,52 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.json.checks;
+package org.sonar.json.checks.generic;
 
-import com.google.common.io.Closeables;
+import com.google.common.annotations.VisibleForTesting;
 import com.sonar.sslr.api.AstNode;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 
 import org.sonar.api.server.rule.RulesDefinition;
-import org.sonar.api.utils.SonarException;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
+import org.sonar.check.RuleProperty;
 import org.sonar.json.JSONCheck;
+import org.sonar.json.checks.Tags;
 import org.sonar.squidbridge.annotations.ActivatedByDefault;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
 import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
 
 @Rule(
-  key = "empty-line-end-of-file",
-  name = "Files should contain an empty new line at the end",
+  key = "S1578",
+  name = "File names should comply with a naming convention",
   priority = Priority.MINOR,
   tags = {Tags.CONVENTION})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.READABILITY)
-@SqaleConstantRemediation("1min")
+@SqaleConstantRemediation("10min")
 @ActivatedByDefault
-public class MissingNewLineAtEndOfFileCheck extends JSONCheck {
+public class FileNameCheck extends JSONCheck {
+
+  public static final String DEFAULT = "^[A-Za-z][-_A-Za-z0-9]*\\.json$";
+
+  @RuleProperty(
+    key = "format",
+    defaultValue = DEFAULT,
+    description = "Regular expression that file names should match")
+  private String format = DEFAULT;
 
   @Override
-  public void visitFile(AstNode astNode) {
-    RandomAccessFile randomAccessFile = null;
-    try {
-      randomAccessFile = new RandomAccessFile(getContext().getFile(), "r");
-      if (!endsWithNewline(randomAccessFile)) {
-        addIssueOnFile(this, "Add an empty new line at the end of this file.");
-      }
-    } catch (IOException e) {
-      throw new SonarException(e);
-    } finally {
-      Closeables.closeQuietly(randomAccessFile);
+  public void visitFile(@Nullable AstNode astNode) {
+    if (!Pattern.compile(format).matcher(getContext().getFile().getName()).matches()) {
+      addIssueOnFile(this, "Rename this file to match this regular expression: " + format);
     }
   }
 
-  private static boolean endsWithNewline(RandomAccessFile randomAccessFile) throws IOException {
-    if (randomAccessFile.length() < 1) {
-      return false;
-    }
-    randomAccessFile.seek(randomAccessFile.length() - 1);
-    byte[] chars = new byte[1];
-    if (randomAccessFile.read(chars) < 1) {
-      return false;
-    }
-    String ch = new String(chars);
-    return "\n".equals(ch) || "\r".equals(ch);
+  @VisibleForTesting
+  public void setFormat(String format) {
+    this.format = format;
   }
 
 }

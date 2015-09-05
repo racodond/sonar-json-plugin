@@ -24,7 +24,8 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
-import com.sonar.sslr.api.*;
+import com.sonar.sslr.api.AstNode;
+import com.sonar.sslr.api.AstNodeType;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -37,7 +38,7 @@ import org.sonar.json.parser.JSONGrammar;
 import org.sonar.squidbridge.SquidAstVisitor;
 import org.sonar.sslr.parser.LexerlessGrammar;
 
-public class SyntaxHighlighterVisitor extends SquidAstVisitor<LexerlessGrammar> implements AstAndTokenVisitor {
+public class SyntaxHighlighterVisitor extends SquidAstVisitor<LexerlessGrammar> {
 
   private static final Map<AstNodeType, String> TYPES = ImmutableMap.<AstNodeType, String>builder()
     .put(JSONGrammar.KEY, "c")
@@ -92,17 +93,6 @@ public class SyntaxHighlighterVisitor extends SquidAstVisitor<LexerlessGrammar> 
     highlighting.highlight(astNode.getFromIndex(), astNode.getToIndex(), TYPES.get(astNode.getType()));
   }
 
-  @Override
-  public void visitToken(Token token) {
-    for (Trivia trivia : token.getTrivia()) {
-      if (trivia.isComment()) {
-        Token triviaToken = trivia.getToken();
-        int offset = getOffset(triviaToken.getLine(), triviaToken.getColumn());
-        highlighting.highlight(offset, offset + triviaToken.getValue().length(), "cppd");
-      }
-    }
-  }
-
   /**
    * @param line starts from 1
    * @param column starts from 0
@@ -117,7 +107,6 @@ public class SyntaxHighlighterVisitor extends SquidAstVisitor<LexerlessGrammar> 
       // parse error
       return;
     }
-
     highlighting.done();
   }
 

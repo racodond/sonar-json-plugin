@@ -32,8 +32,7 @@ public class StringTest extends TestBase {
   public void should_match_STRING() {
     assertThat(b.rule(JSONGrammar.STRING))
       .matches("\"\"")
-      .matches(" \"\"")
-      .matches(" \"abc\"")
+      .matches("\"abc\"")
       .matches("\"\\\\\"")
       .matches("\"aa\\\\aa\"")
       .matches("\"aa\\\"aa\"")

@@ -17,29 +17,8 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.json.checks;
+@ParametersAreNonnullByDefault
+package org.sonar.json.checks.puppet;
 
-import com.sonar.sslr.api.AstNode;
+import javax.annotation.ParametersAreNonnullByDefault;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.sonar.json.parser.JSONGrammar;
-
-public final class CheckUtils {
-
-  @Nonnull
-  public static String getKeyNodeValue(@Nonnull AstNode keyNode) {
-    return getUnquotedString(keyNode.getFirstChild(JSONGrammar.STRING).getTokenValue());
-  }
-
-  @Nullable
-  public static String getValueNodeStringValue(@Nonnull AstNode valueNode) {
-    return valueNode.getFirstChild(JSONGrammar.STRING) != null ? getUnquotedString(valueNode.getFirstChild(JSONGrammar.STRING).getTokenValue()) : null;
-  }
-
-  @Nonnull
-  private static String getUnquotedString(@Nonnull String string) {
-    return string.substring(1, string.length() - 1);
-  }
-}

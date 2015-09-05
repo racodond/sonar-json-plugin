@@ -31,49 +31,37 @@ public class PunctuatorTest extends TestBase {
   @Test
   public void should_match_LBRACE() {
     assertThat(b.rule(JSONGrammar.LBRACE))
-      .matches("{")
-      .matches(" {")
-      .matches("  {");
+      .matches("{");
   }
 
   @Test
   public void should_match_RBRACE() {
     assertThat(b.rule(JSONGrammar.RBRACE))
-      .matches("}")
-      .matches(" }")
-      .matches("  }");
+      .matches("}");
   }
 
   @Test
   public void should_match_LBRACKET() {
     assertThat(b.rule(JSONGrammar.LBRACKET))
-      .matches("[")
-      .matches(" [")
-      .matches("  [");
+      .matches("[");
   }
 
   @Test
   public void should_match_RBRACKET() {
     assertThat(b.rule(JSONGrammar.RBRACKET))
-      .matches("]")
-      .matches(" ]")
-      .matches("  ]");
+      .matches("]");
   }
 
   @Test
   public void should_match_COMMA() {
     assertThat(b.rule(JSONGrammar.COMMA))
-      .matches(",")
-      .matches(" ,")
-      .matches("  ,");
+      .matches(",");
   }
 
   @Test
   public void should_match_COLON() {
     assertThat(b.rule(JSONGrammar.COLON))
-      .matches(":")
-      .matches(" :")
-      .matches("  :");
+      .matches(":");
   }
 
 }

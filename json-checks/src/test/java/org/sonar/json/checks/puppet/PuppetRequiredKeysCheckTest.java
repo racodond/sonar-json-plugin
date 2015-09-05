@@ -53,8 +53,8 @@ public class PuppetRequiredKeysCheckTest {
   }
 
   @Test
-  public void should_not_raise_issue_because_it_is_not_a_metadata_json_file() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/required-keys/different-name/blabla.json"), check);
+  public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
+    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/required-keys/not-metadata-json-file/notmetadata.json"), check);
     CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
   }
 

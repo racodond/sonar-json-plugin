@@ -66,4 +66,11 @@ public class PuppetEnforceAuthorValueCheckTest {
     CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
   }
 
+  @Test
+  public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
+    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/author/not-metadata-json-file/notmetadata.json"),
+      new PuppetEnforceAuthorValueCheck());
+    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+  }
+
 }

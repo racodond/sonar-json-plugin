@@ -34,7 +34,6 @@ import org.sonar.api.batch.rule.Checks;
 import org.sonar.api.issue.Issuable;
 import org.sonar.api.issue.Issue;
 import org.sonar.api.measures.CoreMetrics;
-import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.resources.Project;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.json.JSONAstScanner;
@@ -58,15 +57,12 @@ public class JSONSquidSensor implements Sensor {
   private AstScanner<LexerlessGrammar> scanner;
   private final SonarComponents sonarComponents;
   private final FileSystem fs;
-  private final RulesProfile rulesProfile;
-  private Project project;
   private Checks<SquidAstVisitor> checks;
 
-  public JSONSquidSensor(SonarComponents sonarComponents, FileSystem fs, CheckFactory checkFactory, RulesProfile rulesProfile) {
+  public JSONSquidSensor(SonarComponents sonarComponents, FileSystem fs, CheckFactory checkFactory) {
     this.checkFactory = checkFactory;
     this.sonarComponents = sonarComponents;
     this.fs = fs;
-    this.rulesProfile = rulesProfile;
   }
 
   @Override
@@ -76,7 +72,6 @@ public class JSONSquidSensor implements Sensor {
 
   @Override
   public void analyse(Project project, SensorContext context) {
-    this.project = project;
     this.context = context;
 
     checks = checkFactory.<SquidAstVisitor>create(JSON.KEY).addAnnotatedChecks(CheckList.getChecks());

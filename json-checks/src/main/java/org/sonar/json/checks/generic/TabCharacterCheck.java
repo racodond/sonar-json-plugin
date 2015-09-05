@@ -17,7 +17,7 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.json.checks;
+package org.sonar.json.checks.generic;
 
 import com.google.common.io.Files;
 import com.sonar.sslr.api.AstNode;
@@ -32,6 +32,7 @@ import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.json.JSONCheck;
 import org.sonar.json.ast.visitors.CharsetAwareVisitor;
+import org.sonar.json.checks.Tags;
 import org.sonar.squidbridge.annotations.ActivatedByDefault;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
 import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;

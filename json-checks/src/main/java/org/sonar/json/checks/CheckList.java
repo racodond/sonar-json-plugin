@@ -23,6 +23,10 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.Collection;
 
+import org.sonar.json.checks.generic.FileNameCheck;
+import org.sonar.json.checks.generic.MissingNewLineAtEndOfFileCheck;
+import org.sonar.json.checks.generic.ParsingErrorCheck;
+import org.sonar.json.checks.generic.TabCharacterCheck;
 import org.sonar.json.checks.puppet.*;
 
 public final class CheckList {

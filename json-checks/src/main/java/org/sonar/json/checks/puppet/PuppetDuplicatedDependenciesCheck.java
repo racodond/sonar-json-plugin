@@ -31,7 +31,7 @@ import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.json.JSONCheck;
-import org.sonar.json.checks.CheckUtils;
+import org.sonar.json.checks.utils.CheckUtils;
 import org.sonar.json.checks.Tags;
 import org.sonar.json.parser.JSONGrammar;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
@@ -53,14 +53,13 @@ public class PuppetDuplicatedDependenciesCheck extends JSONCheck {
 
   @Override
   public void visitNode(AstNode node) {
-    if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())) {
-      if ("dependencies".equals(CheckUtils.getKeyNodeValue(node.getFirstChild(JSONGrammar.KEY)))) {
-        List<String> dependencyList = new ArrayList();
-        if (node.getFirstChild(JSONGrammar.VALUE).getFirstChild(JSONGrammar.ARRAY) == null) {
-          addIssue(node, this, "The \"dependencies\" value is invalid. Define an array instead.");
-        } else {
-          checkDuplicatedDependencies(node, dependencyList);
-        }
+    if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())
+      && "dependencies".equals(CheckUtils.getKeyNodeValue(node.getFirstChild(JSONGrammar.KEY)))) {
+      List<String> dependencyList = new ArrayList();
+      if (node.getFirstChild(JSONGrammar.VALUE).getFirstChild(JSONGrammar.ARRAY) == null) {
+        addIssue(node, this, "The \"dependencies\" value is invalid. Define an array instead.");
+      } else {
+        checkDuplicatedDependencies(node, dependencyList);
       }
     }
   }
@@ -76,12 +75,12 @@ public class PuppetDuplicatedDependenciesCheck extends JSONCheck {
       }
     }
     Set<String> duplicatedDependencies = getDuplicates(dependencyList);
-    if (duplicatedDependencies.size() > 0) {
+    if (!duplicatedDependencies.isEmpty()) {
       addIssue(node, this, "Remove the duplicated dependencies: " + Joiner.on(", ").join(duplicatedDependencies) + ".");
     }
   }
 
-  private Set<String> getDuplicates(List<String> dependencyList) {
+  private static Set<String> getDuplicates(List<String> dependencyList) {
     Set<String> duplicatedSet = new HashSet();
     Set<String> notDuplicatedSet = new HashSet();
 

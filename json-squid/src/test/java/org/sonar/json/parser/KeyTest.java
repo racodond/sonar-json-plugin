@@ -32,8 +32,7 @@ public class KeyTest extends TestBase {
   public void should_match_KEY() {
     assertThat(b.rule(JSONGrammar.KEY))
       .matches("\"\"")
-      .matches(" \"\"")
-      .matches(" \"abc\"")
+      .matches("\"abc\"")
       .matches("\"\\\\\"")
       .matches("\"aa\\\\aa\"")
       .matches("\"aa\\\"aa\"")

@@ -17,7 +17,7 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.json.checks;
+package org.sonar.json.checks.generic;
 
 import com.sonar.sslr.api.RecognitionException;
 
@@ -28,6 +28,7 @@ import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.json.JSONCheck;
+import org.sonar.json.checks.Tags;
 import org.sonar.squidbridge.AstScannerExceptionHandler;
 import org.sonar.squidbridge.annotations.ActivatedByDefault;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
@@ -46,7 +47,7 @@ public class ParsingErrorCheck extends JSONCheck implements AstScannerExceptionH
   @Override
   public void processException(Exception e) {
     StringWriter exception = new StringWriter();
-    e.printStackTrace(new PrintWriter(exception));
+    e.printStackTrace(new PrintWriter(exception));  // NOSONAR(squid:S1148): printStackTrace intentionally used
     addIssueOnFile(this, exception.toString());
   }
 

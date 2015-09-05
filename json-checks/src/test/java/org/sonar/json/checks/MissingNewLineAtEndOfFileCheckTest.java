@@ -23,6 +23,7 @@ import java.io.File;
 
 import org.junit.Test;
 import org.sonar.json.JSONAstScanner;
+import org.sonar.json.checks.generic.MissingNewLineAtEndOfFileCheck;
 import org.sonar.squidbridge.api.SourceFile;
 import org.sonar.squidbridge.checks.CheckMessagesVerifier;
 

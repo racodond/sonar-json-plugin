@@ -61,29 +61,29 @@ public enum JSONGrammar implements GrammarRuleKey {
   private static void syntax(LexerlessGrammarBuilder b) {
     b.rule(JSON).is(b.optional(OBJECT), EOF);
 
-    b.rule(OBJECT).is(b.optional(WHITESPACES), LBRACE, b.optional(MEMBERS), RBRACE);
-    b.rule(MEMBERS).is(PAIR, b.zeroOrMore(COMMA, PAIR)).skip();
-    b.rule(PAIR).is(KEY, COLON, VALUE);
+    b.rule(OBJECT).is(b.optional(WHITESPACES), LBRACE, b.optional(MEMBERS), b.optional(WHITESPACES), RBRACE);
+    b.rule(MEMBERS).is(PAIR, b.zeroOrMore(b.optional(WHITESPACES), COMMA, PAIR)).skip();
+    b.rule(PAIR).is(b.optional(WHITESPACES), KEY, b.optional(WHITESPACES), COLON, VALUE);
     b.rule(KEY).is(STRING);
 
-    b.rule(ARRAY).is(b.optional(WHITESPACES), LBRACKET, b.optional(ELEMENTS), RBRACKET);
-    b.rule(ELEMENTS).is(VALUE, b.zeroOrMore(COMMA, VALUE)).skip();
+    b.rule(ARRAY).is(b.optional(WHITESPACES), LBRACKET, b.optional(ELEMENTS), b.optional(WHITESPACES), RBRACKET);
+    b.rule(ELEMENTS).is(VALUE, b.zeroOrMore(b.optional(WHITESPACES), COMMA, VALUE)).skip();
 
-    b.rule(VALUE).is(b.firstOf(TRUE, FALSE, NULL, NUMBER, STRING, OBJECT, ARRAY));
-    b.rule(TRUE).is(b.optional(WHITESPACES), "true");
-    b.rule(FALSE).is(b.optional(WHITESPACES), "false");
-    b.rule(NULL).is(b.optional(WHITESPACES), "null");
-    b.rule(NUMBER).is(b.optional(WHITESPACES), b.regexp("[-]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?"));
+    b.rule(VALUE).is(b.optional(WHITESPACES), b.firstOf(TRUE, FALSE, NULL, NUMBER, STRING, OBJECT, ARRAY));
+    b.rule(TRUE).is("true");
+    b.rule(FALSE).is("false");
+    b.rule(NULL).is("null");
+    b.rule(NUMBER).is(b.regexp("[-]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?"));
 
     // TODO: Check this regular expression, for example \ should not be allowed by itself
-    b.rule(STRING).is(b.optional(WHITESPACES), b.regexp("\"([^\"\\\\]|\\\\\\\\|\\\\\"|\\\\/|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\u[0-9a-fA-F]{4})*\""));
+    b.rule(STRING).is(b.regexp("\"([^\"\\\\]|\\\\\\\\|\\\\\"|\\\\/|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\u[0-9a-fA-F]{4})*\""));
 
-    b.rule(COMMA).is(b.optional(WHITESPACES), ",");
-    b.rule(COLON).is(b.optional(WHITESPACES), ":");
-    b.rule(LBRACE).is(b.optional(WHITESPACES), "{");
-    b.rule(RBRACE).is(b.optional(WHITESPACES), "}");
-    b.rule(LBRACKET).is(b.optional(WHITESPACES), "[");
-    b.rule(RBRACKET).is(b.optional(WHITESPACES), "]");
+    b.rule(COMMA).is(",");
+    b.rule(COLON).is(":");
+    b.rule(LBRACE).is("{");
+    b.rule(RBRACE).is("}");
+    b.rule(LBRACKET).is("[");
+    b.rule(RBRACKET).is("]");
 
     b.rule(WHITESPACES).is(b.zeroOrMore(b.skippedTrivia(b.regexp("(?<!\\\\)[\\s]+")))).skip();
     b.rule(EOF).is(b.optional(WHITESPACES), b.token(GenericTokenType.EOF, b.endOfInput())).skip();

@@ -17,17 +17,8 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.json.checks.puppet;
+@ParametersAreNonnullByDefault
+package org.sonar.json.checks.generic;
 
-import java.io.File;
+import javax.annotation.ParametersAreNonnullByDefault;
 
-public class PuppetCheckUtils {
-
-  private PuppetCheckUtils() {
-  }
-
-  public static final boolean isMetadataJsonFile(File file) {
-    return "metadata.json".equals(file.getName());
-  }
-
-}
