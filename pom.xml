@@ -16,7 +16,7 @@
 
   <name>SonarQube JSON Plugin</name>
   <description>Enables analysis of JSON files in SonarQube</description>
-  <url/>
+  <url>https://github.com/racodond/sonar-json-plugin</url>
   <inceptionYear>2015</inceptionYear>
   <organization>
     <name>David RACODON</name>
