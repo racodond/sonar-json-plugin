@@ -14,5 +14,5 @@ This plugin enables code QA analysis of [JSON files](http://json.org/) within [S
 
 ## Usage
 1. [Install](http://docs.sonarqube.org/display/SONAR/Setup+and+Upgrade) SonarQube
-2. Install the JSON plugin either by a [direct download](https://github.com/racodond/sonar-json-plugin/releases) or through the [update center](http://docs.sonarqube.org/display/SONAR/Update+Center).
+2. Install the JSON plugin either by a [direct download](https://github.com/racodond/sonar-json-plugin/releases) or through the [Update Center](http://docs.sonarqube.org/display/SONAR/Update+Center).
 3. Install your [favorite analyzer](http://docs.sonarqube.org/display/SONAR/Analyzing+Source+Code#AnalyzingSourceCode-RunningAnalysis) (SonarQube Runner, Maven, etc.) and analyze your code.
