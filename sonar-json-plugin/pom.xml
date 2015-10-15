@@ -13,6 +13,7 @@
 
   <name>JSON :: SonarQube Plugin</name>
   <description>Enables analysis of JSON files.</description>
+  <url>https://github.com/racodond/sonar-json-plugin</url>
 
   <properties>
     <sonar.pluginKey>JSON</sonar.pluginKey>
