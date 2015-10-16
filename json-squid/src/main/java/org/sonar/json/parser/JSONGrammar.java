@@ -24,6 +24,9 @@ import org.sonar.sslr.grammar.GrammarRuleKey;
 import org.sonar.sslr.grammar.LexerlessGrammarBuilder;
 import org.sonar.sslr.parser.LexerlessGrammar;
 
+/*
+ * See https://tools.ietf.org/html/rfc7159 and http://json.org/
+ */
 public enum JSONGrammar implements GrammarRuleKey {
 
   JSON,
@@ -59,7 +62,7 @@ public enum JSONGrammar implements GrammarRuleKey {
   }
 
   private static void syntax(LexerlessGrammarBuilder b) {
-    b.rule(JSON).is(b.optional(OBJECT), EOF);
+    b.rule(JSON).is(b.optional(b.firstOf(OBJECT, ARRAY)), EOF);
 
     b.rule(OBJECT).is(b.optional(WHITESPACES), LBRACE, b.optional(MEMBERS), b.optional(WHITESPACES), RBRACE);
     b.rule(MEMBERS).is(PAIR, b.zeroOrMore(b.optional(WHITESPACES), COMMA, PAIR)).skip();

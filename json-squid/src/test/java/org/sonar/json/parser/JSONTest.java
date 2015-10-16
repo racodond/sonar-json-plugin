@@ -42,7 +42,12 @@ public class JSONTest extends TestBase {
       .matches(" { \"abc\": \"def\", \"zzz\" : { \"abc\": \"def\" , \"zzz\" : true } }")
       .matches(" { \"abc\": \"def\", \"zzz\" : { \"abc\": \"def\" , \"zzz\" : null } }")
       .matches(" { \"abc\": \"def\", \"zzz\" : { \"abc\": \"def\" , \"zzz\" : 123 } , \"zzzz\": [ {}, {\"dd\": -12e+13} ]}")
-      .matches(" { \"abc\": \"def\", \"zzz\" : { \"abc\": \"def\" , \"zzz\" : 123 } , \"z\\\\\\\\z\\\"zz\": [ {}, {\"dd\": -12e+13} ]}");
+      .matches(" { \"abc\": \"def\", \"zzz\" : { \"abc\": \"def\" , \"zzz\" : 123 } , \"z\\\\\\\\z\\\"zz\": [ {}, {\"dd\": -12e+13} ]}")
+      .matches("[]")
+      .matches(" []")
+      .matches(" [   ] ")
+      .matches(" [ true, \"abc\" ] ")
+      .matches(" [ {}, true ] ");
   }
 
   @Test
