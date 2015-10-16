@@ -47,13 +47,25 @@ public class JSONTest extends TestBase {
       .matches(" []")
       .matches(" [   ] ")
       .matches(" [ true, \"abc\" ] ")
-      .matches(" [ {}, true ] ");
+      .matches(" [ {}, true ] ")
+      .matches("null")
+      .matches(" null ")
+      .matches("true")
+      .matches(" true ")
+      .matches("false")
+      .matches(" false ")
+      .matches("\"abc\"")
+      .matches(" \"abc\" ")
+      .matches("1.2")
+      .matches(" 1.2 ");
   }
 
   @Test
   public void should_not_match_JSON_file() {
     assertThat(b.rule(JSONGrammar.JSON))
-      .notMatches("abc");
+      .notMatches("abc")
+      .notMatches("\"abc\": \"def\"")
+      .notMatches("true, false");
   }
 
 }

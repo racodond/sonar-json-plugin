@@ -62,7 +62,7 @@ public enum JSONGrammar implements GrammarRuleKey {
   }
 
   private static void syntax(LexerlessGrammarBuilder b) {
-    b.rule(JSON).is(b.optional(b.firstOf(OBJECT, ARRAY)), EOF);
+    b.rule(JSON).is(b.optional(WHITESPACES), b.optional(b.firstOf(OBJECT, ARRAY, TRUE, FALSE, NULL, NUMBER, STRING)), EOF);
 
     b.rule(OBJECT).is(b.optional(WHITESPACES), LBRACE, b.optional(MEMBERS), b.optional(WHITESPACES), RBRACE);
     b.rule(MEMBERS).is(PAIR, b.zeroOrMore(b.optional(WHITESPACES), COMMA, PAIR)).skip();
@@ -72,7 +72,7 @@ public enum JSONGrammar implements GrammarRuleKey {
     b.rule(ARRAY).is(b.optional(WHITESPACES), LBRACKET, b.optional(ELEMENTS), b.optional(WHITESPACES), RBRACKET);
     b.rule(ELEMENTS).is(VALUE, b.zeroOrMore(b.optional(WHITESPACES), COMMA, VALUE)).skip();
 
-    b.rule(VALUE).is(b.optional(WHITESPACES), b.firstOf(TRUE, FALSE, NULL, NUMBER, STRING, OBJECT, ARRAY));
+    b.rule(VALUE).is(b.optional(WHITESPACES), b.firstOf(OBJECT, ARRAY, TRUE, FALSE, NULL, NUMBER, STRING));
     b.rule(TRUE).is("true");
     b.rule(FALSE).is("false");
     b.rule(NULL).is("null");
