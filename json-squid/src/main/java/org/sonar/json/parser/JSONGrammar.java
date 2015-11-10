@@ -51,6 +51,7 @@ public enum JSONGrammar implements GrammarRuleKey {
   COLON,
   COMMA,
 
+  BOM,
   WHITESPACES,
   EOF;
 
@@ -62,7 +63,7 @@ public enum JSONGrammar implements GrammarRuleKey {
   }
 
   private static void syntax(LexerlessGrammarBuilder b) {
-    b.rule(JSON).is(b.optional(WHITESPACES), b.optional(b.firstOf(OBJECT, ARRAY, TRUE, FALSE, NULL, NUMBER, STRING)), EOF);
+    b.rule(JSON).is(b.optional(BOM), b.optional(WHITESPACES), b.optional(b.firstOf(OBJECT, ARRAY, TRUE, FALSE, NULL, NUMBER, STRING)), EOF);
 
     b.rule(OBJECT).is(b.optional(WHITESPACES), LBRACE, b.optional(MEMBERS), b.optional(WHITESPACES), RBRACE);
     b.rule(MEMBERS).is(PAIR, b.zeroOrMore(b.optional(WHITESPACES), COMMA, PAIR)).skip();
@@ -86,6 +87,7 @@ public enum JSONGrammar implements GrammarRuleKey {
     b.rule(LBRACKET).is("[");
     b.rule(RBRACKET).is("]");
 
+    b.rule(BOM).is("\ufeff");
     b.rule(WHITESPACES).is(b.zeroOrMore(b.skippedTrivia(b.regexp("(?<!\\\\)[\\s]+")))).skip();
     b.rule(EOF).is(b.optional(WHITESPACES), b.token(GenericTokenType.EOF, b.endOfInput())).skip();
   }
