@@ -36,6 +36,7 @@ public final class CheckList {
   @SuppressWarnings("rawtypes")
   public static Collection<Class> getChecks() {
     return ImmutableList.<Class>of(
+      BOMCheck.class,
       FileNameCheck.class,
       KeyRegularExpressionCheck.class,
       MissingNewLineAtEndOfFileCheck.class,
