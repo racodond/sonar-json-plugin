@@ -31,6 +31,7 @@ import org.sonar.json.JSONCheck;
 import org.sonar.json.ast.visitors.CharsetAwareVisitor;
 import org.sonar.json.checks.Tags;
 import org.sonar.json.parser.JSONGrammar;
+import org.sonar.squidbridge.annotations.ActivatedByDefault;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
 import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
 
@@ -41,6 +42,7 @@ import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
   tags = {Tags.PITFALL})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.SOFTWARE_RELATED_PORTABILITY)
 @SqaleConstantRemediation("5min")
+@ActivatedByDefault
 public class BOMCheck extends JSONCheck implements CharsetAwareVisitor {
 
   private Charset charset;
