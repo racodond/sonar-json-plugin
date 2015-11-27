@@ -53,10 +53,15 @@ public final class JSONAstScanner {
 
   @VisibleForTesting
   public static SourceFile scanSingleFile(File file, SquidAstVisitor<LexerlessGrammar>... visitors) {
+    return scanSingleFileWithCustomConfiguration(file, new JSONConfiguration(Charsets.UTF_8), visitors);
+  }
+
+  @VisibleForTesting
+  public static SourceFile scanSingleFileWithCustomConfiguration(File file, JSONConfiguration conf, SquidAstVisitor<LexerlessGrammar>... visitors) {
     if (!file.isFile()) {
       throw new IllegalArgumentException("File '" + file + "' not found.");
     }
-    AstScanner scanner = create(new JSONConfiguration(Charsets.UTF_8), null, visitors);
+    AstScanner scanner = create(conf, null, visitors);
     scanner.scanFile(file);
     Collection<SourceCode> sources = scanner.getIndex().search(new QueryByType(SourceFile.class));
     if (sources.size() != 1) {

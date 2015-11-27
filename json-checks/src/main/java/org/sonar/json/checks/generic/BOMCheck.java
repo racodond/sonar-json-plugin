@@ -19,11 +19,16 @@
  */
 package org.sonar.json.checks.generic;
 
+import com.google.common.base.Charsets;
 import com.sonar.sslr.api.AstNode;
+
+import java.nio.charset.Charset;
+
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.json.JSONCheck;
+import org.sonar.json.ast.visitors.CharsetAwareVisitor;
 import org.sonar.json.checks.Tags;
 import org.sonar.json.parser.JSONGrammar;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
@@ -36,11 +41,20 @@ import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
   tags = {Tags.PITFALL})
 @SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.SOFTWARE_RELATED_PORTABILITY)
 @SqaleConstantRemediation("5min")
-public class BOMCheck extends JSONCheck {
+public class BOMCheck extends JSONCheck implements CharsetAwareVisitor {
+
+  private Charset charset;
+
+  @Override
+  public void setCharset(Charset charset) {
+    this.charset = charset;
+  }
 
   @Override
   public void init() {
-    subscribeTo(JSONGrammar.BOM);
+    if (charset.equals(Charsets.UTF_8)) {
+      subscribeTo(JSONGrammar.BOM);
+    }
   }
 
   @Override

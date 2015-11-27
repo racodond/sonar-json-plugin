@@ -19,10 +19,13 @@
  */
 package org.sonar.json.checks;
 
+import com.google.common.base.Charsets;
+
 import java.io.File;
 
 import org.junit.Test;
 import org.sonar.json.JSONAstScanner;
+import org.sonar.json.JSONConfiguration;
 import org.sonar.json.checks.generic.BOMCheck;
 import org.sonar.squidbridge.api.SourceFile;
 import org.sonar.squidbridge.checks.CheckMessagesVerifier;
@@ -30,7 +33,7 @@ import org.sonar.squidbridge.checks.CheckMessagesVerifier;
 public class BOMCheckTest {
 
   @Test
-  public void should_find_a_BOM_and_raise_an_issue() {
+  public void should_find_a_BOM_in_UTF8_file_and_raise_an_issue() {
     SourceFile file = JSONAstScanner.scanSingleFile(
       new File("src/test/resources/checks/utf8WithBOM.json"),
       new BOMCheck());
@@ -40,7 +43,24 @@ public class BOMCheckTest {
   }
 
   @Test
-  public void should_not_find_a_BOM_and_not_raise_any_issue() {
+  public void should_find_a_BOM_in_UTF16_files_but_not_raise_any_issue() {
+    SourceFile file;
+
+    file = JSONAstScanner.scanSingleFileWithCustomConfiguration(
+      new File("src/test/resources/checks/utf16BE.json"),
+      new JSONConfiguration(Charsets.UTF_16BE),
+      new BOMCheck());
+    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+
+    file = JSONAstScanner.scanSingleFileWithCustomConfiguration(
+      new File("src/test/resources/checks/utf16LE.json"),
+      new JSONConfiguration(Charsets.UTF_16LE),
+      new BOMCheck());
+    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+  }
+
+  @Test
+  public void should_not_find_a_BOM_in_UTF8_file_and_not_raise_any_issue() {
     SourceFile file = JSONAstScanner.scanSingleFile(
       new File("src/test/resources/checks/sample.json"),
       new BOMCheck());
