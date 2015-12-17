@@ -11,7 +11,7 @@
 
   <groupId>org.codehaus.sonar-plugins.json</groupId>
   <artifactId>json</artifactId>
-  <version>1.4</version>
+  <version>1.5-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>SonarQube JSON Plugin</name>
