@@ -40,7 +40,7 @@
   </developers>
 
   <modules>
-    <module>json-squid</module>
+    <module>json-frontend</module>
     <module>json-checks</module>
     <module>sonar-json-plugin</module>
   </modules>
