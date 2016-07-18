@@ -41,7 +41,6 @@
 
   <modules>
     <module>json-squid</module>
-    <module>sslr-json-toolkit</module>
     <module>json-checks</module>
     <module>sonar-json-plugin</module>
   </modules>
@@ -97,11 +96,6 @@
       <dependency>
         <groupId>org.codehaus.sonar.sslr</groupId>
         <artifactId>sslr-xpath</artifactId>
-        <version>${sslr.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.sonar.sslr</groupId>
-        <artifactId>sslr-toolkit</artifactId>
         <version>${sslr.version}</version>
       </dependency>
       <dependency>
