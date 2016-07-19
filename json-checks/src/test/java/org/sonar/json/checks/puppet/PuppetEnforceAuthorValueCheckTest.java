@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,64 +13,73 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.checks.puppet;
 
-import java.io.File;
-
 import org.junit.Test;
-import org.sonar.json.JSONAstScanner;
-import org.sonar.squidbridge.api.SourceFile;
-import org.sonar.squidbridge.checks.CheckMessagesVerifier;
+import org.sonar.json.checks.CheckTestUtils;
+import org.sonar.json.checks.verifier.JSONCheckVerifier;
 
 public class PuppetEnforceAuthorValueCheckTest {
 
   @Test
   public void should_match_the_default_required_value_and_not_raise_any_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/author/default/metadata.json"), new PuppetEnforceAuthorValueCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+    JSONCheckVerifier.issues(
+      new PuppetEnforceAuthorValueCheck(),
+      CheckTestUtils.getTestFile("puppet/author/default/metadata.json"))
+      .noMore();
   }
 
   @Test
   public void should_match_the_required_custom_value_and_not_raise_any_issue() {
     PuppetEnforceAuthorValueCheck check = new PuppetEnforceAuthorValueCheck();
     check.setAuthor("Pat");
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/author/custom/metadata.json"), check);
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+
+    JSONCheckVerifier.issues(
+      check,
+      CheckTestUtils.getTestFile("puppet/author/custom/metadata.json"))
+      .noMore();
   }
 
   @Test
   public void should_not_match_the_required_default_value_and_raise_an_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/author/custom/metadata.json"), new PuppetEnforceAuthorValueCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages())
-      .next().atLine(4).withMessage("Set the author to \"John Doe\".").
-      noMore();
+    JSONCheckVerifier.issues(
+      new PuppetEnforceAuthorValueCheck(),
+      CheckTestUtils.getTestFile("puppet/author/default-issue/metadata.json"))
+      .next().atLine(4).withMessage("Set the author to \"John Doe\".")
+      .next().atLine(5).withMessage("Set the author to \"John Doe\".")
+      .noMore();
   }
 
   @Test
   public void should_not_match_the_required_custom_value_and_raise_an_issue() {
     PuppetEnforceAuthorValueCheck check = new PuppetEnforceAuthorValueCheck();
     check.setAuthor("Smith");
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/author/custom/metadata.json"), check);
-    CheckMessagesVerifier.verify(file.getCheckMessages())
-      .next().atLine(4).withMessage("Set the author to \"Smith\".").
-      noMore();
+
+    JSONCheckVerifier.issues(
+      check,
+      CheckTestUtils.getTestFile("puppet/author/custom/metadata.json"))
+      .next().atLine(4).withMessage("Set the author to \"Smith\".")
+      .noMore();
   }
 
   @Test
   public void should_not_be_triggered_when_no_author_is_defined() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/required-keys/missing-keys/metadata.json"), new PuppetEnforceAuthorValueCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+    JSONCheckVerifier.issues(
+      new PuppetEnforceAuthorValueCheck(),
+      CheckTestUtils.getTestFile("puppet/required-keys/missing-keys/metadata.json"))
+      .noMore();
   }
 
   @Test
   public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/author/not-metadata-json-file/notmetadata.json"),
-      new PuppetEnforceAuthorValueCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+    JSONCheckVerifier.issues(
+      new PuppetEnforceAuthorValueCheck(),
+      CheckTestUtils.getTestFile("puppet/author/not-metadata-json-file/notmetadata.json"))
+      .noMore();
   }
 
 }

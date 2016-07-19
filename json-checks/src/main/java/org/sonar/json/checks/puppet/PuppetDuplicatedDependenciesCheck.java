@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,83 +13,78 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.checks.puppet;
 
-import com.google.common.base.Joiner;
-import com.sonar.sslr.api.AstNode;
+import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
-import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
-import org.sonar.json.JSONCheck;
-import org.sonar.json.checks.utils.CheckUtils;
 import org.sonar.json.checks.Tags;
-import org.sonar.json.parser.JSONGrammar;
+import org.sonar.plugins.json.api.tree.*;
+import org.sonar.plugins.json.api.visitors.issue.PreciseIssue;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
-import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
 
 @Rule(
   key = "puppet-duplicated-dependencies",
   name = "Duplicated dependencies should be removed from Puppet \"metadata.json\" files",
   priority = Priority.MAJOR,
   tags = {Tags.PITFALL, Tags.PUPPET})
-@SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
 @SqaleConstantRemediation("5min")
-public class PuppetDuplicatedDependenciesCheck extends JSONCheck {
+public class PuppetDuplicatedDependenciesCheck extends AbstractPuppetCheck {
 
   @Override
-  public void init() {
-    subscribeTo(JSONGrammar.PAIR);
-  }
-
-  @Override
-  public void visitNode(AstNode node) {
-    if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())
-      && "dependencies".equals(CheckUtils.getKeyNodeValue(node.getFirstChild(JSONGrammar.KEY)))) {
-      List<String> dependencyList = new ArrayList();
-      if (node.getFirstChild(JSONGrammar.VALUE).getFirstChild(JSONGrammar.ARRAY) == null) {
-        addIssue(node, this, "The \"dependencies\" value is invalid. Define an array instead.");
+  public void visitPair(PairTree pair) {
+    if ("dependencies".equals(pair.key().actualText())) {
+      if (!pair.value().value().is(Tree.Kind.ARRAY)) {
+        addPreciseIssue(pair.value(), "The \"dependencies\" value is invalid. Define an array instead.");
       } else {
-        checkDuplicatedDependencies(node, dependencyList);
+        checkDuplicatedDependencies(((ArrayTree) pair.value().value()).elements());
       }
     }
+    super.visitPair(pair);
   }
 
-  private void checkDuplicatedDependencies(AstNode node, List<String> dependencyList) {
-    for (AstNode arrayValues : node.getFirstChild(JSONGrammar.VALUE).getFirstChild(JSONGrammar.ARRAY).getChildren(JSONGrammar.VALUE)) {
-      for (AstNode dependencies : arrayValues.getChildren(JSONGrammar.OBJECT)) {
-        for (AstNode dependency : dependencies.getChildren(JSONGrammar.PAIR)) {
-          if ("name".equals(CheckUtils.getKeyNodeValue(dependency.getFirstChild(JSONGrammar.KEY)))) {
-            dependencyList.add(CheckUtils.getValueNodeStringValue(dependency.getFirstChild(JSONGrammar.VALUE)));
+  private void checkDuplicatedDependencies(List<ValueTree> dependencies) {
+    Map<String, List<ValueTree>> dependenciesMap = buildDependenciesMap(dependencies);
+    createIssues(dependenciesMap);
+  }
+
+  private Map<String, List<ValueTree>> buildDependenciesMap(List<ValueTree> dependencies) {
+    Map<String, List<ValueTree>> dependenciesMap = new HashMap<>();
+    for (ValueTree dependency : dependencies) {
+      if (dependency.value().is(Tree.Kind.OBJECT)) {
+        for (PairTree pair : ((ObjectTree) dependency.value()).pairs()) {
+          if ("name".equals(pair.key().actualText()) && pair.value().value().is(Tree.Kind.STRING)) {
+            String actualValue = ((StringTree) pair.value().value()).actualText();
+            if (dependenciesMap.containsKey(actualValue)) {
+              dependenciesMap.get(actualValue).add(pair.value());
+            } else {
+              dependenciesMap.put(actualValue, Lists.newArrayList(pair.value()));
+            }
           }
         }
       }
     }
-    Set<String> duplicatedDependencies = getDuplicates(dependencyList);
-    if (!duplicatedDependencies.isEmpty()) {
-      addIssue(node, this, "Remove the duplicated dependencies: " + Joiner.on(", ").join(duplicatedDependencies) + ".");
-    }
+    return dependenciesMap;
   }
 
-  private static Set<String> getDuplicates(List<String> dependencyList) {
-    Set<String> duplicatedSet = new HashSet();
-    Set<String> notDuplicatedSet = new HashSet();
-
-    for (String dependency : dependencyList) {
-      if (!notDuplicatedSet.add(dependency)) {
-        duplicatedSet.add(dependency);
+  private void createIssues(Map<String, List<ValueTree>> dependenciesMap) {
+    for (Map.Entry<String, List<ValueTree>> entry : dependenciesMap.entrySet()) {
+      if (entry.getValue().size() > 1) {
+        PreciseIssue issue = addPreciseIssue(entry.getValue().get(0), "Merge those duplicated \"" + entry.getKey() + "\" dependencies.");
+        for (int i = 1; i < entry.getValue().size(); i++) {
+          issue.secondary(entry.getValue().get(i), "Duplicated dependency");
+        }
       }
     }
-    return duplicatedSet;
   }
 
 }

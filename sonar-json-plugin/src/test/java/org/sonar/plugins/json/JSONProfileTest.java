@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.plugins.json;
 
@@ -28,7 +28,6 @@ import org.sonar.api.rules.RuleFinder;
 import org.sonar.api.utils.ValidationMessages;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,8 +41,8 @@ public class JSONProfileTest {
     RulesProfile profile = definition.createProfile(validation);
 
     assertThat(profile.getName()).isEqualTo(JSONProfile.SONARQUBE_WAY_PROFILE_NAME);
-    assertThat(profile.getLanguage()).isEqualTo(JSON.KEY);
-    assertThat(profile.getActiveRulesByRepository(JSON.KEY)).hasSize(5);
+    assertThat(profile.getLanguage()).isEqualTo(JSONLanguage.KEY);
+    assertThat(profile.getActiveRulesByRepository(JSONLanguage.KEY)).hasSize(5);
     assertThat(validation.hasErrors()).isFalse();
   }
 

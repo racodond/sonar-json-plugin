@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,91 +13,146 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.plugins.json;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.base.Charsets;
 
 import java.io.File;
-import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.util.Collection;
 
-import org.apache.commons.collections.ListUtils;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.sonar.api.batch.SensorContext;
-import org.sonar.api.batch.fs.FilePredicate;
-import org.sonar.api.batch.fs.FilePredicates;
-import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.batch.fs.internal.DefaultInputFile;
+import org.sonar.api.batch.fs.internal.FileMetadata;
+import org.sonar.api.batch.rule.ActiveRules;
 import org.sonar.api.batch.rule.CheckFactory;
-import org.sonar.api.batch.rule.Checks;
+import org.sonar.api.batch.rule.internal.ActiveRulesBuilder;
+import org.sonar.api.batch.sensor.internal.DefaultSensorDescriptor;
+import org.sonar.api.batch.sensor.internal.SensorContextTester;
+import org.sonar.api.batch.sensor.issue.Issue;
 import org.sonar.api.measures.CoreMetrics;
-import org.sonar.api.measures.FileLinesContext;
-import org.sonar.api.measures.FileLinesContextFactory;
-import org.sonar.api.resources.Project;
-import org.sonar.json.ast.visitors.SonarComponents;
-import org.sonar.squidbridge.SquidAstVisitor;
+import org.sonar.api.rule.RuleKey;
+import org.sonar.check.Rule;
+import org.sonar.json.checks.CheckList;
+import org.sonar.json.checks.generic.MissingNewLineAtEndOfFileCheck;
+import org.sonar.json.checks.generic.TabCharacterCheck;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 public class JSONSquidSensorTest {
 
-  private JSONSquidSensor sensor;
-  private FileSystem fs;
-  private FileLinesContextFactory fileLinesContextFactory;
-  private CheckFactory checkFactory;
+  private final File baseDir = new File("src/test/resources");
+  private final SensorContextTester context = SensorContextTester.create(baseDir);
+  private CheckFactory checkFactory = new CheckFactory(mock(ActiveRules.class));
 
-  @Before
-  public void setUp() {
-    fileLinesContextFactory = mock(FileLinesContextFactory.class);
-    FileLinesContext fileLinesContext = mock(FileLinesContext.class);
-    when(fileLinesContextFactory.createFor(Mockito.any(InputFile.class))).thenReturn(fileLinesContext);
-
-    fs = mock(FileSystem.class);
-    when(fs.predicates()).thenReturn(mock(FilePredicates.class));
-    when(fs.files(Mockito.any(FilePredicate.class))).thenReturn(
-      Arrays.asList(new File("src/test/resources/sample.json")));
-    when(fs.encoding()).thenReturn(Charset.forName("UTF-8"));
-
-    Checks<SquidAstVisitor> checks = mock(Checks.class);
-    when(checks.addAnnotatedChecks(Mockito.anyCollection())).thenReturn(checks);
-    checkFactory = mock(CheckFactory.class);
-    when(checkFactory.<SquidAstVisitor>create(Mockito.anyString())).thenReturn(checks);
-
-    sensor = new JSONSquidSensor(null, fs, checkFactory);
+  @Test
+  public void should_create_a_valid_sensor_descriptor() {
+    DefaultSensorDescriptor descriptor = new DefaultSensorDescriptor();
+    createJSONSquidSensor().describe(descriptor);
+    assertThat(descriptor.name()).isEqualTo("JSON Squid Sensor");
+    assertThat(descriptor.languages()).containsOnly("json");
+    assertThat(descriptor.type()).isEqualTo(InputFile.Type.MAIN);
   }
 
   @Test
-  public void should_execute_on() {
-    Project project = new Project("key");
-    FileSystem fs = mock(FileSystem.class);
-    when(fs.predicates()).thenReturn(mock(FilePredicates.class));
-    JSONSquidSensor cssSensor = new JSONSquidSensor(mock(SonarComponents.class), fs, mock(CheckFactory.class));
-
-    when(fs.files(Mockito.any(FilePredicate.class))).thenReturn(ListUtils.EMPTY_LIST);
-    assertThat(cssSensor.shouldExecuteOnProject(project)).isFalse();
-
-    when(fs.files(Mockito.any(FilePredicate.class))).thenReturn(ImmutableList.of(new File("/tmp")));
-    assertThat(cssSensor.shouldExecuteOnProject(project)).isTrue();
+  public void should_execute_and_compute_valid_measures_on_UTF8_file_without_BOM() {
+    String relativePath = "sampleUTF8WithBOM.json";
+    inputFile(relativePath);
+    createJSONSquidSensor().execute(context);
+    assertMeasure("moduleKey:" + relativePath);
   }
 
   @Test
-  public void should_analyse() {
-    Project project = new Project("key");
-    SensorContext context = mock(SensorContext.class);
+  public void should_execute_and_compute_valid_measures_on_UTF8_file_with_BOM() {
+    String relativePath = "sample.json";
+    inputFile(relativePath);
+    createJSONSquidSensor().execute(context);
+    assertMeasure("moduleKey:" + relativePath);
+  }
 
-    sensor.analyse(project, context);
+  private void assertMeasure(String key) {
+    assertThat(context.measure(key, CoreMetrics.NCLOC).value()).isEqualTo(6);
+    assertThat(context.measure(key, CoreMetrics.STATEMENTS).value()).isEqualTo(7);
+    assertThat(context.measure(key, CoreMetrics.CLASSES).value()).isEqualTo(3);
+  }
 
-    verify(context).saveMeasure(Mockito.any(InputFile.class), Mockito.eq(CoreMetrics.LINES), Mockito.eq(9.0));
-    verify(context).saveMeasure(Mockito.any(InputFile.class), Mockito.eq(CoreMetrics.NCLOC), Mockito.eq(6.0));
-    verify(context).saveMeasure(Mockito.any(InputFile.class), Mockito.eq(CoreMetrics.STATEMENTS), Mockito.eq(7.0));
-    verify(context).saveMeasure(Mockito.any(InputFile.class), Mockito.eq(CoreMetrics.CLASSES), Mockito.eq(3.0));
+  @Test
+  public void should_execute_and_save_issues_on_UTF8_file_with_BOM() {
+    should_execute_and_save_issues("sampleUTF8WithBOM.json");
+  }
+
+  @Test
+  public void should_execute_and_save_issues_on_UTF8_file_without_BOM() {
+    should_execute_and_save_issues("sample.json");
+  }
+
+  private void should_execute_and_save_issues(String fileName) {
+    inputFile(fileName);
+
+    ActiveRules activeRules = (new ActiveRulesBuilder())
+      .create(RuleKey.of(CheckList.REPOSITORY_KEY, TabCharacterCheck.class.getAnnotation(Rule.class).key()))
+      .activate()
+      .create(RuleKey.of(CheckList.REPOSITORY_KEY, MissingNewLineAtEndOfFileCheck.class.getAnnotation(Rule.class).key()))
+      .activate()
+      .build();
+    checkFactory = new CheckFactory(activeRules);
+
+    createJSONSquidSensor().execute(context);
+
+    assertThat(context.allIssues()).hasSize(2);
+  }
+
+  @Test
+  public void should_raise_an_issue_because_the_parsing_error_rule_is_activated() {
+    inputFile("parsingError.json");
+
+    ActiveRules activeRules = (new ActiveRulesBuilder())
+      .create(RuleKey.of(CheckList.REPOSITORY_KEY, "S2260"))
+      .activate()
+      .build();
+
+    checkFactory = new CheckFactory(activeRules);
+
+    context.setActiveRules(activeRules);
+    createJSONSquidSensor().execute(context);
+    Collection<Issue> issues = context.allIssues();
+    assertThat(issues).hasSize(1);
+    Issue issue = issues.iterator().next();
+    assertThat(issue.primaryLocation().textRange().start().line()).isEqualTo(1);
+  }
+
+  @Test
+  public void should_not_raise_any_issue_because_the_parsing_error_rule_is_not_activated() {
+    inputFile("parsingError.json");
+
+    ActiveRules activeRules = new ActiveRulesBuilder().build();
+    checkFactory = new CheckFactory(activeRules);
+
+    context.setActiveRules(activeRules);
+    createJSONSquidSensor().execute(context);
+    Collection<Issue> issues = context.allIssues();
+    assertThat(issues).hasSize(0);
+  }
+
+  private JSONSquidSensor createJSONSquidSensor() {
+    return new JSONSquidSensor(context.fileSystem(), checkFactory);
+  }
+
+  private void inputFile(String relativePath) {
+    DefaultInputFile inputFile = new DefaultInputFile("moduleKey", relativePath)
+      .setModuleBaseDir(baseDir.toPath())
+      .setType(InputFile.Type.MAIN)
+      .setLanguage(JSONLanguage.KEY);
+
+    context.fileSystem().setEncoding(Charsets.UTF_8);
+    context.fileSystem().add(inputFile);
+
+    inputFile.initMetadata(new FileMetadata().readMetadata(inputFile.file(), Charsets.UTF_8));
   }
 
 }

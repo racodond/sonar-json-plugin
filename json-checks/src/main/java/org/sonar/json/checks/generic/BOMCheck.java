@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,37 +13,33 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.checks.generic;
 
 import com.google.common.base.Charsets;
-import com.sonar.sslr.api.AstNode;
 
 import java.nio.charset.Charset;
 
-import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
-import org.sonar.json.JSONCheck;
-import org.sonar.json.ast.visitors.CharsetAwareVisitor;
 import org.sonar.json.checks.Tags;
-import org.sonar.json.parser.JSONGrammar;
+import org.sonar.json.visitors.CharsetAwareVisitor;
+import org.sonar.plugins.json.api.tree.JsonTree;
+import org.sonar.plugins.json.api.visitors.DoubleDispatchVisitorCheck;
 import org.sonar.squidbridge.annotations.ActivatedByDefault;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
-import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
 
 @Rule(
   key = "bom-utf8-files",
   name = "BOM should not be used for UTF-8 files",
   priority = Priority.MAJOR,
   tags = {Tags.PITFALL})
-@SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.SOFTWARE_RELATED_PORTABILITY)
 @SqaleConstantRemediation("5min")
 @ActivatedByDefault
-public class BOMCheck extends JSONCheck implements CharsetAwareVisitor {
+public class BOMCheck extends DoubleDispatchVisitorCheck implements CharsetAwareVisitor {
 
   private Charset charset;
 
@@ -53,15 +49,10 @@ public class BOMCheck extends JSONCheck implements CharsetAwareVisitor {
   }
 
   @Override
-  public void init() {
-    if (charset.equals(Charsets.UTF_8)) {
-      subscribeTo(JSONGrammar.BOM);
+  public void visitJson(JsonTree tree) {
+    if (charset.equals(Charsets.UTF_8) && tree.hasByteOrderMark()) {
+      addFileIssue("Remove the BOM.");
     }
-  }
-
-  @Override
-  public void visitNode(AstNode node) {
-    addIssueOnFile(this, "Remove the BOM.");
   }
 
 }

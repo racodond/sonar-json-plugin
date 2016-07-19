@@ -3,20 +3,22 @@
 </p>
 <p>
     Given a version number MAJOR.MINOR.PATCH, increment the:
+</p>
 <ul>
     <li>MAJOR version when you make incompatible API changes</li>
     <li>MINOR version when you add functionality in a backwards-compatible manner</li>
     <li>PATCH version when you make backwards-compatible bug fixes</li>
 </ul>
-</p>
 <p>
     This rule check the version format that should be made of 3 digits separated by dots: ^\d+\.\d+\.\d+$
 </p>
-<h2>Nocompliant Version</h2>
+
+<h2>Noncompliant Version</h2>
 <pre>
 1.0
 1.0.0.2
 </pre>
+
 <h2>Compliant Version</h2>
 <pre>
 1.0.0

@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,33 +13,30 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.checks.puppet;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.sonar.sslr.api.AstNode;
-import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.check.RuleProperty;
-import org.sonar.json.JSONCheck;
-import org.sonar.json.checks.utils.CheckUtils;
 import org.sonar.json.checks.Tags;
-import org.sonar.json.parser.JSONGrammar;
+import org.sonar.plugins.json.api.tree.PairTree;
+import org.sonar.plugins.json.api.tree.StringTree;
+import org.sonar.plugins.json.api.tree.Tree;
+import org.sonar.plugins.json.api.tree.ValueTree;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
-import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
 
 @Rule(
   key = "puppet-enforce-author-value",
   name = "\"author\" should match the required value in Puppet \"metadata.json\" files",
   priority = Priority.MAJOR,
   tags = {Tags.CONVENTION, Tags.PUPPET})
-@SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
 @SqaleConstantRemediation("5min")
-public class PuppetEnforceAuthorValueCheck extends JSONCheck {
+public class PuppetEnforceAuthorValueCheck extends AbstractPuppetCheck {
 
   private static final String DEFAULT_AUTHOR = "John Doe";
 
@@ -50,21 +47,25 @@ public class PuppetEnforceAuthorValueCheck extends JSONCheck {
   private String author = DEFAULT_AUTHOR;
 
   @Override
-  public void init() {
-    subscribeTo(JSONGrammar.PAIR);
-  }
-
-  @Override
-  public void visitNode(AstNode node) {
-    if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())
-      && "author".equals(CheckUtils.getKeyNodeValue(node.getFirstChild(JSONGrammar.KEY)))
-      && !author.equals(CheckUtils.getValueNodeStringValue(node.getFirstChild(JSONGrammar.VALUE)))) {
-      addIssue(node.getFirstChild(JSONGrammar.VALUE), this, "Set the author to \"" + author + "\".");
+  public void visitPair(PairTree pair) {
+    if ("author".equals(pair.key().actualText())) {
+      if (!pair.value().value().is(Tree.Kind.STRING)) {
+        createIssue(pair.value());
+      } else {
+        if (!author.equals(((StringTree) pair.value().value()).actualText())) {
+          createIssue(pair.value());
+        }
+      }
     }
+    super.visitPair(pair);
   }
 
   @VisibleForTesting
   public void setAuthor(String author) {
     this.author = author;
+  }
+
+  private void createIssue(ValueTree tree) {
+    addPreciseIssue(tree, "Set the author to \"" + author + "\".");
   }
 }

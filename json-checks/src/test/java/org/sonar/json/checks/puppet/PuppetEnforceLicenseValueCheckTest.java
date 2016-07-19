@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,86 +13,85 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.checks.puppet;
 
-import java.io.File;
-
 import org.junit.Test;
-import org.sonar.json.JSONAstScanner;
-import org.sonar.squidbridge.api.SourceFile;
-import org.sonar.squidbridge.checks.CheckMessagesVerifier;
+import org.sonar.json.checks.CheckTestUtils;
+import org.sonar.json.checks.verifier.JSONCheckVerifier;
 
 public class PuppetEnforceLicenseValueCheckTest {
 
+  private static final String DEFAULT_MESSAGE = "Set the license to \"LGPL-3.0\".";
+
   @Test
   public void should_match_the_default_required_value_and_not_raise_any_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(
-      new File("src/test/resources/checks/puppet/license/valid-spdx/metadata.json"),
-      new PuppetEnforceLicenseValueCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+    JSONCheckVerifier.issues(
+      new PuppetEnforceLicenseValueCheck(),
+      CheckTestUtils.getTestFile("puppet/license/valid-spdx/metadata.json"))
+      .noMore();
   }
 
   @Test
   public void should_match_the_required_custom_value_and_not_raise_any_issue() {
     PuppetEnforceLicenseValueCheck check = new PuppetEnforceLicenseValueCheck();
     check.setLicense("blabla");
-    SourceFile file = JSONAstScanner.scanSingleFile(
-      new File("src/test/resources/checks/puppet/license/match-required-value/metadata.json"),
-      check);
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+
+    JSONCheckVerifier.issues(
+      check,
+      CheckTestUtils.getTestFile("puppet/license/match-required-value-custom/metadata.json"))
+      .noMore();
   }
 
   @Test
   public void should_not_match_the_required_default_value_and_raise_an_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(
-      new File("src/test/resources/checks/puppet/license/match-required-value/metadata.json"),
-      new PuppetEnforceLicenseValueCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages())
-      .next().atLine(5).withMessage("Set the license to \"LGPL-3.0\".").
-      noMore();
+    JSONCheckVerifier.issues(
+      new PuppetEnforceLicenseValueCheck(),
+      CheckTestUtils.getTestFile("puppet/license/match-required-value/metadata.json"))
+      .next().atLine(5).withMessage(DEFAULT_MESSAGE)
+      .next().atLine(6).withMessage(DEFAULT_MESSAGE)
+      .noMore();
   }
 
   @Test
   public void should_not_match_the_required_custom_value_and_raise_an_issue() {
     PuppetEnforceLicenseValueCheck check = new PuppetEnforceLicenseValueCheck();
     check.setLicense("blabla");
-    SourceFile file = JSONAstScanner.scanSingleFile(
-      new File("src/test/resources/checks/puppet/license/valid-spdx/metadata.json"),
-      check);
-    CheckMessagesVerifier.verify(file.getCheckMessages())
-      .next().atLine(5).withMessage("Set the license to \"blabla\".").
-      noMore();
+
+    JSONCheckVerifier.issues(
+      check,
+      CheckTestUtils.getTestFile("puppet/license/valid-spdx/metadata.json"))
+      .next().atLine(5).withMessage("Set the license to \"blabla\".")
+      .noMore();
   }
 
   @Test
   public void should_not_be_triggered_when_no_license_is_defined() {
-    SourceFile file = JSONAstScanner.scanSingleFile(
-      new File("src/test/resources/checks/puppet/license/no-license/metadata.json"),
-      new PuppetEnforceLicenseValueCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+    JSONCheckVerifier.issues(
+      new PuppetEnforceLicenseValueCheck(),
+      CheckTestUtils.getTestFile("puppet/license/no-license/metadata.json"))
+      .noMore();
   }
 
   @Test
   public void should_raise_two_issues() {
-    SourceFile file = JSONAstScanner.scanSingleFile(
-      new File("src/test/resources/checks/puppet/license/two-licenses/metadata.json"),
-      new PuppetEnforceLicenseValueCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages())
-      .next().atLine(5).withMessage("Set the license to \"LGPL-3.0\".")
-      .next().atLine(6).withMessage("Set the license to \"LGPL-3.0\".")
+    JSONCheckVerifier.issues(
+      new PuppetEnforceLicenseValueCheck(),
+      CheckTestUtils.getTestFile("puppet/license/two-licenses/metadata.json"))
+      .next().atLine(5).withMessage(DEFAULT_MESSAGE)
+      .next().atLine(6).withMessage(DEFAULT_MESSAGE)
       .noMore();
   }
 
   @Test
   public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
-    SourceFile file = JSONAstScanner.scanSingleFile(
-      new File("src/test/resources/checks/puppet/license/not-metadata-json-file/notmetadata.json"),
-      new PuppetEnforceLicenseValueCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+    JSONCheckVerifier.issues(
+      new PuppetEnforceLicenseValueCheck(),
+      CheckTestUtils.getTestFile("puppet/license/not-metadata-json-file/notmetadata.json"))
+      .noMore();
   }
 
 }

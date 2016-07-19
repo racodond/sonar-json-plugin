@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,119 +13,189 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.plugins.json;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
+import com.sonar.sslr.api.RecognitionException;
+import com.sonar.sslr.api.typed.ActionParser;
 
 import java.io.File;
-import java.util.Collection;
+import java.io.InterruptedIOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import org.sonar.api.batch.Sensor;
-import org.sonar.api.batch.SensorContext;
+import org.sonar.api.batch.fs.FilePredicate;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.InputFile.Type;
 import org.sonar.api.batch.rule.CheckFactory;
-import org.sonar.api.batch.rule.Checks;
-import org.sonar.api.issue.Issuable;
-import org.sonar.api.issue.Issue;
-import org.sonar.api.measures.CoreMetrics;
-import org.sonar.api.resources.Project;
+import org.sonar.api.batch.sensor.Sensor;
+import org.sonar.api.batch.sensor.SensorContext;
+import org.sonar.api.batch.sensor.SensorDescriptor;
+import org.sonar.api.batch.sensor.issue.NewIssue;
+import org.sonar.api.batch.sensor.issue.NewIssueLocation;
 import org.sonar.api.rule.RuleKey;
-import org.sonar.json.JSONAstScanner;
-import org.sonar.json.JSONConfiguration;
-import org.sonar.json.api.JSONMetric;
-import org.sonar.json.ast.visitors.SonarComponents;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
 import org.sonar.json.checks.CheckList;
-import org.sonar.squidbridge.AstScanner;
-import org.sonar.squidbridge.SquidAstVisitor;
-import org.sonar.squidbridge.api.CheckMessage;
-import org.sonar.squidbridge.api.SourceCode;
-import org.sonar.squidbridge.api.SourceFile;
-import org.sonar.squidbridge.indexer.QueryByType;
-import org.sonar.sslr.parser.LexerlessGrammar;
+import org.sonar.json.checks.generic.ParsingErrorCheck;
+import org.sonar.json.parser.JSONParserBuilder;
+import org.sonar.json.visitors.CharsetAwareVisitor;
+import org.sonar.json.visitors.JSONVisitorContext;
+import org.sonar.json.visitors.SyntaxHighlighterVisitor;
+import org.sonar.json.visitors.metrics.MetricsVisitor;
+import org.sonar.plugins.json.api.JSONCheck;
+import org.sonar.plugins.json.api.tree.JsonTree;
+import org.sonar.plugins.json.api.tree.Tree;
+import org.sonar.plugins.json.api.visitors.TreeVisitor;
+import org.sonar.plugins.json.api.visitors.issue.Issue;
+import org.sonar.squidbridge.ProgressReport;
+import org.sonar.squidbridge.api.AnalysisException;
 
 public class JSONSquidSensor implements Sensor {
 
-  private final CheckFactory checkFactory;
+  private static final Logger LOG = Loggers.get(JSONSquidSensor.class);
 
-  private SensorContext context;
-  private AstScanner<LexerlessGrammar> scanner;
-  private final SonarComponents sonarComponents;
-  private final FileSystem fs;
-  private Checks<SquidAstVisitor> checks;
+  private final FileSystem fileSystem;
+  private final JSONChecks checks;
+  private final ActionParser<Tree> parser;
+  private final FilePredicate mainFilePredicate;
+  private IssueSaver issueSaver;
+  private RuleKey parsingErrorRuleKey = null;
 
-  public JSONSquidSensor(SonarComponents sonarComponents, FileSystem fs, CheckFactory checkFactory) {
-    this.checkFactory = checkFactory;
-    this.sonarComponents = sonarComponents;
-    this.fs = fs;
+  public JSONSquidSensor(FileSystem fileSystem, CheckFactory checkFactory) {
+    this.fileSystem = fileSystem;
+
+    this.mainFilePredicate = fileSystem.predicates().and(
+      fileSystem.predicates().hasType(InputFile.Type.MAIN),
+      fileSystem.predicates().hasLanguage(JSONLanguage.KEY));
+
+    this.parser = JSONParserBuilder.createParser(fileSystem.encoding());
+
+    this.checks = JSONChecks.createJSONCheck(checkFactory)
+      .addChecks(CheckList.REPOSITORY_KEY, CheckList.getChecks());
   }
 
   @Override
-  public boolean shouldExecuteOnProject(Project project) {
-    return filesToAnalyze().iterator().hasNext();
+  public void describe(SensorDescriptor descriptor) {
+    descriptor
+      .onlyOnLanguage(JSONLanguage.KEY)
+      .name("JSON Squid Sensor")
+      .onlyOnFileType(Type.MAIN);
   }
 
   @Override
-  public void analyse(Project project, SensorContext context) {
-    this.context = context;
+  public void execute(SensorContext sensorContext) {
+    List<TreeVisitor> treeVisitors = Lists.newArrayList();
+    treeVisitors.addAll(checks.visitorChecks());
+    treeVisitors.add(new SyntaxHighlighterVisitor(sensorContext));
+    treeVisitors.add(new MetricsVisitor(sensorContext));
 
-    checks = checkFactory.<SquidAstVisitor>create(JSON.KEY).addAnnotatedChecks(CheckList.getChecks());
-    Collection<SquidAstVisitor> checkList = checks.all();
-    JSONConfiguration conf = new JSONConfiguration(fs.encoding());
-    this.scanner = JSONAstScanner.create(conf, sonarComponents, checkList.toArray(new SquidAstVisitor[checkList.size()]));
-    scanner.scanFiles(Lists.newArrayList(filesToAnalyze()));
+    setParsingErrorCheckIfActivated(treeVisitors);
 
-    Collection<SourceCode> squidSourceFiles = scanner.getIndex().search(new QueryByType(SourceFile.class));
-    save(squidSourceFiles, checks);
-  }
+    ProgressReport progressReport = new ProgressReport("Report about progress of JSON analyzer", TimeUnit.SECONDS.toMillis(10));
+    progressReport.start(Lists.newArrayList(fileSystem.files(mainFilePredicate)));
 
-  private Iterable<File> filesToAnalyze() {
-    return fs.files(fs.predicates().and(fs.predicates().hasLanguage(JSON.KEY), fs.predicates().hasType(Type.MAIN)));
-  }
+    issueSaver = new IssueSaver(sensorContext, checks);
+    List<Issue> issues = new ArrayList<>();
 
-  private void save(Collection<SourceCode> squidSourceFiles, Checks<SquidAstVisitor> checks) {
-    for (SourceCode squidSourceFile : squidSourceFiles) {
-      SourceFile squidFile = (SourceFile) squidSourceFile;
-      InputFile sonarFile = fs.inputFile(fs.predicates().hasAbsolutePath(squidFile.getKey()));
-      saveMeasures(sonarFile, squidFile);
-      saveIssues(sonarFile, squidFile, checks);
+    boolean success = false;
+    try {
+      for (InputFile inputFile : fileSystem.inputFiles(mainFilePredicate)) {
+        issues.addAll(analyzeFile(sensorContext, inputFile, treeVisitors));
+        progressReport.nextFile();
+      }
+      saveSingleFileIssues(issues);
+      success = true;
+    } finally {
+      stopProgressReport(progressReport, success);
     }
   }
 
-  private void saveMeasures(InputFile sonarFile, SourceFile squidFile) {
-    context.saveMeasure(sonarFile, CoreMetrics.LINES, squidFile.getDouble(JSONMetric.LINES));
-    context.saveMeasure(sonarFile, CoreMetrics.NCLOC, squidFile.getDouble(JSONMetric.LINES_OF_CODE));
-    context.saveMeasure(sonarFile, CoreMetrics.STATEMENTS, squidFile.getDouble(JSONMetric.STATEMENTS));
-    context.saveMeasure(sonarFile, CoreMetrics.CLASSES, squidFile.getDouble(JSONMetric.CLASSES));
+  private List<Issue> analyzeFile(SensorContext sensorContext, InputFile inputFile, List<TreeVisitor> visitors) {
+    try {
+      JsonTree jsonTree = (JsonTree) parser.parse(new File(inputFile.absolutePath()));
+      return scanFile(inputFile, jsonTree, visitors);
+
+    } catch (RecognitionException e) {
+      checkInterrupted(e);
+      LOG.error("Unable to parse file: " + inputFile.absolutePath());
+      LOG.error(e.getMessage());
+      processRecognitionException(e, sensorContext, inputFile);
+
+    } catch (Exception e) {
+      checkInterrupted(e);
+      throw new AnalysisException("Unable to analyse file: " + inputFile.absolutePath(), e);
+    }
+    return new ArrayList<>();
   }
 
-  private void saveIssues(InputFile sonarFile, SourceFile squidFile, Checks<SquidAstVisitor> checks) {
-    Collection<CheckMessage> messages = squidFile.getCheckMessages();
-    if (messages != null) {
-      for (CheckMessage message : messages) {
-        RuleKey activeRule = checks.ruleKey((SquidAstVisitor) message.getCheck());
-        Issuable issuable = sonarComponents.getResourcePerspectives().as(Issuable.class, sonarFile);
-        if (issuable != null && activeRule != null) {
-          Issue issue = issuable.newIssueBuilder()
-            .ruleKey(RuleKey.of(activeRule.repository(), activeRule.rule()))
-            .line(message.getLine())
-            .message(message.formatDefaultMessage())
-            .effortToFix(message.getCost())
-            .build();
-          issuable.addIssue(issue);
-        }
+  private List<Issue> scanFile(InputFile inputFile, JsonTree json, List<TreeVisitor> visitors) {
+    JSONVisitorContext context = new JSONVisitorContext(json, inputFile.file());
+    List<Issue> issues = new ArrayList<>();
+    for (TreeVisitor visitor : visitors) {
+      if (visitor instanceof CharsetAwareVisitor) {
+        ((CharsetAwareVisitor) visitor).setCharset(fileSystem.encoding());
+      }
+      if (visitor instanceof JSONCheck) {
+        issues.addAll(((JSONCheck) visitor).scanFile(context));
+      } else {
+        visitor.scanTree(context);
+      }
+    }
+    return issues;
+  }
+
+  private void saveSingleFileIssues(List<Issue> issues) {
+    for (Issue issue : issues) {
+      issueSaver.saveIssue(issue);
+    }
+  }
+
+  private void processRecognitionException(RecognitionException e, SensorContext sensorContext, InputFile inputFile) {
+    if (parsingErrorRuleKey != null) {
+      NewIssue newIssue = sensorContext.newIssue();
+
+      NewIssueLocation primaryLocation = newIssue.newLocation()
+        .message(e.getMessage())
+        .on(inputFile)
+        .at(inputFile.selectLine(e.getLine()));
+
+      newIssue
+        .forRule(parsingErrorRuleKey)
+        .at(primaryLocation)
+        .save();
+    }
+  }
+
+  private void setParsingErrorCheckIfActivated(List<TreeVisitor> treeVisitors) {
+    for (TreeVisitor check : treeVisitors) {
+      if (check instanceof ParsingErrorCheck) {
+        parsingErrorRuleKey = checks.ruleKeyFor((JSONCheck) check);
+        break;
       }
     }
   }
 
-  @Override
-  public String toString() {
-    return getClass().getSimpleName();
+  private static void stopProgressReport(ProgressReport progressReport, boolean success) {
+    if (success) {
+      progressReport.stop();
+    } else {
+      progressReport.cancel();
+    }
+  }
+
+  private static void checkInterrupted(Exception e) {
+    Throwable cause = Throwables.getRootCause(e);
+    if (cause instanceof InterruptedException || cause instanceof InterruptedIOException) {
+      throw new AnalysisException("Analysis cancelled", e);
+    }
   }
 
 }

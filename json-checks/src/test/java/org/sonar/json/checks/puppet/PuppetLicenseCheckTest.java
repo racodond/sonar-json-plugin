@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,55 +13,49 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.checks.puppet;
 
-import java.io.File;
-
 import org.junit.Test;
-import org.sonar.json.JSONAstScanner;
-import org.sonar.squidbridge.api.SourceFile;
-import org.sonar.squidbridge.checks.CheckMessagesVerifier;
+import org.sonar.json.checks.CheckTestUtils;
+import org.sonar.json.checks.verifier.JSONCheckVerifier;
 
 public class PuppetLicenseCheckTest {
 
-  private PuppetLicenseCheck check = new PuppetLicenseCheck();
-
   @Test
   public void should_define_a_valid_license_listed_by_SPDX_and_not_raise_any_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/license/valid-spdx/metadata.json"), check);
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
-  }
-
-  @Test
-  public void should_define_a_valid_proprietary_license_and_not_raise_any_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/license/valid-proprietary/metadata.json"), check);
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
-  }
-
-  @Test
-  public void should_define_an_invalid_license_and_raise_an_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/license/invalid/metadata.json"), check);
-    CheckMessagesVerifier.verify(file.getCheckMessages()).next()
-      .withMessage("License \"blabla\" is not a valid license. Define a valid license.")
+    JSONCheckVerifier.issues(
+      new PuppetLicenseCheck(),
+      CheckTestUtils.getTestFile("puppet/license/valid-spdx/metadata.json"))
       .noMore();
   }
 
   @Test
-  public void should_define_two_licenses_and_raise_an_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/license/two-licenses/metadata.json"), check);
-    CheckMessagesVerifier.verify(file.getCheckMessages()).next()
-      .withMessage("Several license definitions have been found. Keep only one license definition.")
+  public void should_define_a_valid_proprietary_license_and_not_raise_any_issue() {
+    JSONCheckVerifier.issues(
+      new PuppetLicenseCheck(),
+      CheckTestUtils.getTestFile("puppet/license/valid-proprietary/metadata.json"))
+      .noMore();
+  }
+
+  @Test
+  public void should_define_an_invalid_license_and_raise_an_issue() {
+    JSONCheckVerifier.issues(
+      new PuppetLicenseCheck(),
+      CheckTestUtils.getTestFile("puppet/license/invalid/metadata.json"))
+      .next().atLine(5).withMessage("Define a valid license.")
       .noMore();
   }
 
   @Test
   public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/license/not-metadata-json-file/notmetadata.json"), check);
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+    JSONCheckVerifier.issues(
+      new PuppetLicenseCheck(),
+      CheckTestUtils.getTestFile("puppet/license/not-metadata-json-file/notmetadata.json"))
+      .noMore();
   }
 
 }

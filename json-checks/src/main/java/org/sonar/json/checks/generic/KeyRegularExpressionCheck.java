@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,24 +13,21 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.checks.generic;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
-import com.sonar.sslr.api.AstNode;
 
 import java.util.regex.Pattern;
 
-import org.sonar.api.utils.SonarException;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.check.RuleProperty;
-import org.sonar.json.JSONCheck;
-import org.sonar.json.parser.JSONGrammar;
+import org.sonar.plugins.json.api.tree.KeyTree;
+import org.sonar.plugins.json.api.visitors.DoubleDispatchVisitorCheck;
 import org.sonar.squidbridge.annotations.NoSqale;
 import org.sonar.squidbridge.annotations.RuleTemplate;
 
@@ -40,11 +37,10 @@ import org.sonar.squidbridge.annotations.RuleTemplate;
   priority = Priority.MAJOR)
 @RuleTemplate
 @NoSqale
-public class KeyRegularExpressionCheck extends JSONCheck {
+public class KeyRegularExpressionCheck extends DoubleDispatchVisitorCheck {
 
   private static final String DEFAULT_REGULAR_EXPRESSION = ".*";
   private static final String DEFAULT_MESSAGE = "The regular expression matches this key.";
-  private Pattern pattern;
 
   @RuleProperty(
     key = "regularExpression",
@@ -59,22 +55,11 @@ public class KeyRegularExpressionCheck extends JSONCheck {
   private String message = DEFAULT_MESSAGE;
 
   @Override
-  public void init() {
-    subscribeTo(JSONGrammar.KEY);
-    if (!Strings.isNullOrEmpty(regularExpression)) {
-      try {
-        this.pattern = Pattern.compile(regularExpression);
-      } catch (RuntimeException e) {
-        throw new SonarException("Unable to compile regular expression: " + regularExpression, e);
-      }
+  public void visitKey(KeyTree tree) {
+    if (Pattern.compile(regularExpression).matcher(tree.actualText()).matches()) {
+      addPreciseIssue(tree, message);
     }
-  }
-
-  @Override
-  public void visitNode(AstNode node) {
-    if (pattern.matcher(node.getTokenValue()).matches()) {
-      addIssue(node, this, message);
-    }
+    super.visitKey(tree);
   }
 
   @VisibleForTesting

@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,82 +13,114 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.parser;
 
-import com.sonar.sslr.api.GenericTokenType;
-import org.sonar.sslr.grammar.GrammarRuleKey;
-import org.sonar.sslr.grammar.LexerlessGrammarBuilder;
-import org.sonar.sslr.parser.LexerlessGrammar;
+import com.sonar.sslr.api.typed.GrammarBuilder;
+import org.sonar.json.tree.impl.InternalSyntaxToken;
+import org.sonar.json.tree.impl.SyntaxList;
+import org.sonar.plugins.json.api.tree.*;
 
-/*
- * See https://tools.ietf.org/html/rfc7159 and http://json.org/
- */
-public enum JSONGrammar implements GrammarRuleKey {
+public class JSONGrammar {
 
-  JSON,
-  OBJECT,
-  MEMBERS,
-  PAIR,
-  KEY,
-  ARRAY,
-  ELEMENTS,
-  VALUE,
+  private final GrammarBuilder<InternalSyntaxToken> b;
+  private final TreeFactory f;
 
-  STRING,
-  NUMBER,
-  TRUE,
-  FALSE,
-  NULL,
-
-  LBRACKET,
-  RBRACKET,
-  LBRACE,
-  RBRACE,
-  COLON,
-  COMMA,
-
-  BOM,
-  WHITESPACES,
-  EOF;
-
-  public static LexerlessGrammar createGrammar() {
-    LexerlessGrammarBuilder b = LexerlessGrammarBuilder.create();
-    syntax(b);
-    b.setRootRule(JSON);
-    return b.build();
+  public JSONGrammar(GrammarBuilder<InternalSyntaxToken> b, TreeFactory f) {
+    this.b = b;
+    this.f = f;
   }
 
-  private static void syntax(LexerlessGrammarBuilder b) {
-    b.rule(JSON).is(b.optional(BOM), b.optional(WHITESPACES), b.optional(b.firstOf(OBJECT, ARRAY, TRUE, FALSE, NULL, NUMBER, STRING)), EOF);
-
-    b.rule(OBJECT).is(b.optional(WHITESPACES), LBRACE, b.optional(MEMBERS), b.optional(WHITESPACES), RBRACE);
-    b.rule(MEMBERS).is(PAIR, b.zeroOrMore(b.optional(WHITESPACES), COMMA, PAIR)).skip();
-    b.rule(PAIR).is(b.optional(WHITESPACES), KEY, b.optional(WHITESPACES), COLON, VALUE);
-    b.rule(KEY).is(STRING);
-
-    b.rule(ARRAY).is(b.optional(WHITESPACES), LBRACKET, b.optional(ELEMENTS), b.optional(WHITESPACES), RBRACKET);
-    b.rule(ELEMENTS).is(VALUE, b.zeroOrMore(b.optional(WHITESPACES), COMMA, VALUE)).skip();
-
-    b.rule(VALUE).is(b.optional(WHITESPACES), b.firstOf(OBJECT, ARRAY, TRUE, FALSE, NULL, NUMBER, STRING));
-    b.rule(TRUE).is("true");
-    b.rule(FALSE).is("false");
-    b.rule(NULL).is("null");
-    b.rule(NUMBER).is(b.regexp("[-]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?"));
-    b.rule(STRING).is(b.regexp("\"([^\"\\\\]*+(\\\\([\\\\\"/bfnrt]|u[0-9a-fA-F]{4}))?+)*+\""));
-
-    b.rule(COMMA).is(",");
-    b.rule(COLON).is(":");
-    b.rule(LBRACE).is("{");
-    b.rule(RBRACE).is("}");
-    b.rule(LBRACKET).is("[");
-    b.rule(RBRACKET).is("]");
-
-    b.rule(BOM).is("\ufeff");
-    b.rule(WHITESPACES).is(b.zeroOrMore(b.skippedTrivia(b.regexp("(?<!\\\\)[\\s]+")))).skip();
-    b.rule(EOF).is(b.optional(WHITESPACES), b.token(GenericTokenType.EOF, b.endOfInput())).skip();
+  public JsonTree JSON() {
+    return b.<JsonTree>nonterminal(JSONLexicalGrammar.JSON).is(
+      f.json(
+        b.optional(b.token(JSONLexicalGrammar.BOM)),
+        b.optional(VALUE()),
+        b.token(JSONLexicalGrammar.EOF)));
   }
+
+  public ObjectTree OBJECT() {
+    return b.<ObjectTree>nonterminal(JSONLexicalGrammar.OBJECT).is(
+      f.object(
+        b.token(JSONLexicalGrammar.LEFT_BRACE),
+        b.optional(PAIR_LIST()),
+        b.token(JSONLexicalGrammar.RIGHT_BRACE)));
+  }
+
+  public ArrayTree ARRAY() {
+    return b.<ArrayTree>nonterminal(JSONLexicalGrammar.ARRAY).is(
+      f.array(
+        b.token(JSONLexicalGrammar.LEFT_BRACKET),
+        b.optional(VALUE_LIST()),
+        b.token(JSONLexicalGrammar.RIGHT_BRACKET)));
+  }
+
+  public SyntaxList<ValueTree> VALUE_LIST() {
+    return b.<SyntaxList<ValueTree>>nonterminal().is(
+      b.firstOf(
+        f.valueList(VALUE(), b.token(JSONLexicalGrammar.COMMA), VALUE_LIST()),
+        f.valueList(VALUE())));
+  }
+
+  public SyntaxList<PairTree> PAIR_LIST() {
+    return b.<SyntaxList<PairTree>>nonterminal().is(
+      b.firstOf(
+        f.pairList(PAIR(), b.token(JSONLexicalGrammar.COMMA), PAIR_LIST()),
+        f.pairList(PAIR())));
+  }
+
+  public PairTree PAIR() {
+    return b.<PairTree>nonterminal(JSONLexicalGrammar.PAIR).is(
+      f.pair(
+        KEY(),
+        b.token(JSONLexicalGrammar.COLON),
+        VALUE()));
+  }
+
+  public KeyTree KEY() {
+    return b.<KeyTree>nonterminal(JSONLexicalGrammar.KEY).is(
+      f.key(b.token(JSONLexicalGrammar.STRING)));
+  }
+
+  public ValueTree VALUE() {
+    return b.<ValueTree>nonterminal(JSONLexicalGrammar.VALUE).is(
+      f.value(
+        b.firstOf(
+          OBJECT(),
+          ARRAY(),
+          TRUE(),
+          FALSE(),
+          NULL(),
+          NUMBER(),
+          STRING())));
+  }
+
+  public StringTree STRING() {
+    return b.<StringTree>nonterminal().is(
+      f.string(b.token(JSONLexicalGrammar.STRING)));
+  }
+
+  public LiteralTree NUMBER() {
+    return b.<LiteralTree>nonterminal().is(
+      f.number(b.token(JSONLexicalGrammar.NUMBER)));
+  }
+
+  public LiteralTree FALSE() {
+    return b.<LiteralTree>nonterminal().is(
+      f.falsee(b.token(JSONLexicalGrammar.FALSE)));
+  }
+
+  public LiteralTree TRUE() {
+    return b.<LiteralTree>nonterminal().is(
+      f.truee(b.token(JSONLexicalGrammar.TRUE)));
+  }
+
+  public LiteralTree NULL() {
+    return b.<LiteralTree>nonterminal().is(
+      f.nulle(b.token(JSONLexicalGrammar.NULL)));
+  }
+
 }
