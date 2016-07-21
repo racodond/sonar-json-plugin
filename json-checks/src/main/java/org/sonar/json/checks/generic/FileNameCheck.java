@@ -53,6 +53,7 @@ public class FileNameCheck extends SubscriptionVisitorCheck {
     description = "Regular expression that file names should match. See " + CheckUtils.LINK_TO_JAVA_REGEX_PATTERN_DOC + " for detailed regular expression syntax.")
   private String format = DEFAULT;
 
+  @Override
   public List<Tree.Kind> nodesToVisit() {
     return ImmutableList.of(Tree.Kind.JSON);
   }

@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -111,12 +110,9 @@ public class SyntaxHighlighterVisitorTest {
   }
 
   @Test
-  @Ignore
   public void key() throws Exception {
-    //FIXME: highlight overlap
     highlight("{\"blabla\": 2}");
     assertHighlighting(1, 1, 8, KEYWORD);
-    assertHighlighting(1, 1, 8, STRING);
     assertHighlighting(1, 11, 1, CONSTANT);
   }
 

@@ -23,10 +23,7 @@ import com.google.common.base.Charsets;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.sonar.api.ce.measure.test.TestIssue;
 import org.sonar.json.visitors.CharsetAwareVisitor;
 import org.sonar.plugins.json.api.JSONCheck;
 import org.sonar.squidbridge.checks.CheckMessagesVerifier;
@@ -36,7 +33,8 @@ import org.sonar.squidbridge.checks.CheckMessagesVerifier;
  */
 public class JSONCheckVerifier {
 
-  private final List<TestIssue> expectedIssues = new ArrayList<>();
+  private JSONCheckVerifier() {
+  }
 
   /**
    * Check issues

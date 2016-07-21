@@ -58,7 +58,7 @@ public class PuppetRequiredKeysCheck extends AbstractPuppetCheck {
         }
       }
 
-      if (missingKeys.size() > 0) {
+      if (!missingKeys.isEmpty()) {
         addFileIssue("Add the following keys that are required: " + Joiner.on(", ").join(missingKeys) + ".");
       }
     }
