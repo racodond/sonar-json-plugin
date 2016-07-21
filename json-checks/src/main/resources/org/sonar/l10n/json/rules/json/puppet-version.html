@@ -10,17 +10,21 @@
     <li>PATCH version when you make backwards-compatible bug fixes</li>
 </ul>
 <p>
-    This rule check the version format that should be made of 3 digits separated by dots: ^\d+\.\d+\.\d+$
+    This rule check the version format that should be made of 3 digits separated by dots: <code>^\d+\.\d+\.\d+$</code>
 </p>
 
 <h2>Noncompliant Version</h2>
 <pre>
-1.0
-1.0.0.2
+{
+  "version": "1.0",
+  "version": "1.0.0.2"
+}
 </pre>
 
 <h2>Compliant Version</h2>
 <pre>
-1.0.0
-1.0.2
+{
+  "version": "1.0.0",
+  "version": "1.0.2"
+}
 </pre>
