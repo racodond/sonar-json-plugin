@@ -22,10 +22,12 @@ package org.sonar.json.checks.generic;
 import com.google.common.annotations.VisibleForTesting;
 
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.check.RuleProperty;
+import org.sonar.json.checks.CheckUtils;
 import org.sonar.plugins.json.api.tree.KeyTree;
 import org.sonar.plugins.json.api.visitors.DoubleDispatchVisitorCheck;
 import org.sonar.squidbridge.annotations.NoSqale;
@@ -44,7 +46,7 @@ public class KeyRegularExpressionCheck extends DoubleDispatchVisitorCheck {
 
   @RuleProperty(
     key = "regularExpression",
-    description = "The regular expression",
+    description = "The regular expression. See " + CheckUtils.LINK_TO_JAVA_REGEX_PATTERN_DOC + " for detailed regular expression syntax.",
     defaultValue = DEFAULT_REGULAR_EXPRESSION)
   private String regularExpression = DEFAULT_REGULAR_EXPRESSION;
 
@@ -62,6 +64,19 @@ public class KeyRegularExpressionCheck extends DoubleDispatchVisitorCheck {
     super.visitKey(tree);
   }
 
+  @Override
+  public void validateParameters() {
+    try {
+      Pattern.compile(regularExpression);
+    } catch (PatternSyntaxException exception) {
+      throw new IllegalStateException(
+        CheckUtils.paramsErrorMessage(
+          this.getClass(),
+          "regularExpression parameter \"" + regularExpression + "\" is not a valid regular expression."),
+        exception);
+    }
+  }
+
   @VisibleForTesting
   public void setRegularExpression(String regularExpression) {
     this.regularExpression = regularExpression;
@@ -71,4 +86,5 @@ public class KeyRegularExpressionCheck extends DoubleDispatchVisitorCheck {
   public void setMessage(String message) {
     this.message = message;
   }
+
 }
