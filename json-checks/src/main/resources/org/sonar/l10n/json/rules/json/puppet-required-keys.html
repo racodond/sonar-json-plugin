@@ -1,5 +1,6 @@
 <p>
     Every Puppet <code>metadata.json</code> file should define the following keys:
+</p>
 <ul>
     <li>name</li>
     <li>version</li>
@@ -9,7 +10,7 @@
     <li>source</li>
     <li>dependencies</li>
 </ul>
-</p>
+
 <h2>Noncompliant Code Example</h2>
 Missing <code>author</code> and <code>license</code> keys:
 <pre>
@@ -24,6 +25,7 @@ Missing <code>author</code> and <code>license</code> keys:
   ]
 }
 </pre>
+
 <h2>Compliant Solution</h2>
 <pre>
 {
@@ -39,6 +41,7 @@ Missing <code>author</code> and <code>license</code> keys:
   ]
 }
 </pre>
+
 <h2>See</h2>
 <ul>
     <li><a href="http://docs.puppetlabs.com/puppet/latest/reference/modules_publishing.html#write-a-metadatajson-file">Puppet

@@ -9,13 +9,24 @@
   </parent>
 
   <artifactId>json-checks</artifactId>
-  <name>JSON :: Checks</name>
+  <name>SonarQube JSON Plugin :: Checks</name>
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>json-squid</artifactId>
-      <version>${project.version}</version>
+      <artifactId>json-frontend</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>json-checks-testkit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonarsource.sonarqube</groupId>
+      <artifactId>sonar-plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

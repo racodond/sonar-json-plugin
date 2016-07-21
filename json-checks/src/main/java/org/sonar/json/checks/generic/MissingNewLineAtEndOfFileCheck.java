@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,50 +13,41 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.checks.generic;
-
-import com.google.common.io.Closeables;
-import com.sonar.sslr.api.AstNode;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import org.sonar.api.server.rule.RulesDefinition;
-import org.sonar.api.utils.SonarException;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
-import org.sonar.json.JSONCheck;
 import org.sonar.json.checks.Tags;
+import org.sonar.plugins.json.api.tree.JsonTree;
+import org.sonar.plugins.json.api.visitors.DoubleDispatchVisitorCheck;
 import org.sonar.squidbridge.annotations.ActivatedByDefault;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
-import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
 
 @Rule(
   key = "empty-line-end-of-file",
   name = "Files should contain an empty new line at the end",
   priority = Priority.MINOR,
   tags = {Tags.CONVENTION})
-@SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.READABILITY)
 @SqaleConstantRemediation("1min")
 @ActivatedByDefault
-public class MissingNewLineAtEndOfFileCheck extends JSONCheck {
+public class MissingNewLineAtEndOfFileCheck extends DoubleDispatchVisitorCheck {
 
   @Override
-  public void visitFile(AstNode astNode) {
-    RandomAccessFile randomAccessFile = null;
-    try {
-      randomAccessFile = new RandomAccessFile(getContext().getFile(), "r");
+  public void visitJson(JsonTree tree) {
+    try (RandomAccessFile randomAccessFile = new RandomAccessFile(getContext().getFile(), "r")) {
       if (!endsWithNewline(randomAccessFile)) {
-        addIssueOnFile(this, "Add an empty new line at the end of this file.");
+        addFileIssue("Add an empty new line at the end of this file.");
       }
     } catch (IOException e) {
-      throw new SonarException(e);
-    } finally {
-      Closeables.closeQuietly(randomAccessFile);
+      throw new IllegalStateException("Check json:" + this.getClass().getAnnotation(Rule.class).key()
+        + ": Error while reading " + getContext().getFile().getName(), e);
     }
   }
 

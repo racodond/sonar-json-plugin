@@ -30,3 +30,4 @@ Desktop.ini
 log.txt
 *~
 *.versionsBackup
+.sonar

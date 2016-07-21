@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,27 +13,21 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.checks.puppet;
 
-import java.io.File;
-
 import org.junit.Test;
-import org.sonar.json.JSONAstScanner;
-import org.sonar.squidbridge.api.SourceFile;
-import org.sonar.squidbridge.checks.CheckMessagesVerifier;
+import org.sonar.json.checks.CheckTestUtils;
+import org.sonar.json.checks.verifier.JSONCheckVerifier;
 
 public class PuppetDeprecatedKeysCheckTest {
 
   @Test
   public void should_find_some_deprecated_keys_and_raise_some_issues() {
-    SourceFile file = JSONAstScanner.scanSingleFile(
-      new File("src/test/resources/checks/puppet/deprecated-keys/metadata.json"),
-      new PuppetDeprecatedKeysCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages())
+    JSONCheckVerifier.issues(new PuppetDeprecatedKeysCheck(), CheckTestUtils.getTestFile("puppet/deprecated-keys/metadata.json"))
       .next().atLine(4).withMessage("Replace this deprecated \"description\" key by the \"summary\" key.")
       .next().atLine(5).withMessage("Remove this deprecated \"types\" key.")
       .next().atLine(6).withMessage("Remove this deprecated \"checksums\" key.")
@@ -42,10 +36,8 @@ public class PuppetDeprecatedKeysCheckTest {
 
   @Test
   public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
-    SourceFile file = JSONAstScanner.scanSingleFile(
-      new File("src/test/resources/checks/puppet/deprecated-keys/notmetadata.json"),
-      new PuppetDeprecatedKeysCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+    JSONCheckVerifier.issues(new PuppetDeprecatedKeysCheck(), CheckTestUtils.getTestFile("puppet/deprecated-keys/notmetadata.json"))
+      .noMore();
   }
 
 }

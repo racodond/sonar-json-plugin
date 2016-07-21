@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,29 +13,26 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.checks.generic;
 
 import com.google.common.io.Files;
-import com.sonar.sslr.api.AstNode;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import org.sonar.api.server.rule.RulesDefinition;
-import org.sonar.api.utils.SonarException;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
-import org.sonar.json.JSONCheck;
-import org.sonar.json.ast.visitors.CharsetAwareVisitor;
 import org.sonar.json.checks.Tags;
+import org.sonar.json.visitors.CharsetAwareVisitor;
+import org.sonar.plugins.json.api.tree.JsonTree;
+import org.sonar.plugins.json.api.visitors.DoubleDispatchVisitorCheck;
 import org.sonar.squidbridge.annotations.ActivatedByDefault;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
-import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
 
 @Rule(
   key = "tab-character",
@@ -43,9 +40,8 @@ import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
   priority = Priority.MINOR,
   tags = {Tags.CONVENTION})
 @ActivatedByDefault
-@SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.READABILITY)
 @SqaleConstantRemediation("2min")
-public class TabCharacterCheck extends JSONCheck implements CharsetAwareVisitor {
+public class TabCharacterCheck extends DoubleDispatchVisitorCheck implements CharsetAwareVisitor {
 
   private Charset charset;
 
@@ -55,16 +51,17 @@ public class TabCharacterCheck extends JSONCheck implements CharsetAwareVisitor 
   }
 
   @Override
-  public void visitFile(AstNode astNode) {
+  public void visitJson(JsonTree tree) {
     List<String> lines;
     try {
       lines = Files.readLines(getContext().getFile(), charset);
     } catch (IOException e) {
-      throw new SonarException(e);
+      throw new IllegalStateException("Check json:" + this.getClass().getAnnotation(Rule.class).key()
+        + ": Error while reading " + getContext().getFile().getName(), e);
     }
     for (String line : lines) {
       if (line.contains("\t")) {
-        addIssueOnFile(this, "Replace all tab characters in this file by sequences of whitespaces.");
+        addFileIssue("Replace all tab characters in this file by sequences of whitespaces.");
         break;
       }
     }

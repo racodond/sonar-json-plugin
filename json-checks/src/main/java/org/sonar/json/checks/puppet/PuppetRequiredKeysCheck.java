@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,69 +13,61 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.checks.puppet;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import com.sonar.sslr.api.AstNode;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
-import org.sonar.json.JSONCheck;
-import org.sonar.json.checks.utils.CheckUtils;
 import org.sonar.json.checks.Tags;
-import org.sonar.json.parser.JSONGrammar;
+import org.sonar.plugins.json.api.tree.JsonTree;
+import org.sonar.plugins.json.api.tree.KeyTree;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
-import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
 
 @Rule(
   key = "puppet-required-keys",
   name = "Puppet \"metadata.json\" files should define all the required keys",
   priority = Priority.MAJOR,
   tags = {Tags.CONVENTION, Tags.PUPPET})
-@SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
 @SqaleConstantRemediation("10min")
-public class PuppetRequiredKeysCheck extends JSONCheck {
+public class PuppetRequiredKeysCheck extends AbstractPuppetCheck {
 
-  private static final List<String> requiredKeys = ImmutableList.of("name", "version", "author", "license", "summary", "source", "dependencies");
-  private List definedKeys = new ArrayList();
-  private List missingKeys = new ArrayList();
-
-  @Override
-  public void init() {
-    subscribeTo(JSONGrammar.JSON);
-  }
+  private static final List<String> REQUIRED_KEYS = ImmutableList.of("name", "version", "author", "license", "summary", "source", "dependencies");
+  private final List<String> definedKeys = new ArrayList<>();
+  private final List<String> missingKeys = new ArrayList<>();
 
   @Override
-  public void visitNode(AstNode node) {
-    if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile()) && node.getFirstChild(JSONGrammar.OBJECT) != null) {
-      for (AstNode pairNode : node.getFirstChild(JSONGrammar.OBJECT).getChildren(JSONGrammar.PAIR)) {
-        definedKeys.add(CheckUtils.getKeyNodeValue(pairNode.getFirstChild(JSONGrammar.KEY)));
-      }
-    }
-  }
+  public void visitJson(JsonTree tree) {
+    definedKeys.clear();
+    missingKeys.clear();
 
-  @Override
-  public void leaveFile(AstNode node) {
-    if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())) {
-      for (String requiredKey : requiredKeys) {
+    if ("metadata.json".equals(getContext().getFile().getName())) {
+      super.visitJson(tree);
+
+      for (String requiredKey : REQUIRED_KEYS) {
         if (!definedKeys.contains(requiredKey)) {
           missingKeys.add(requiredKey);
         }
       }
-      if (!missingKeys.isEmpty()) {
-        addIssueOnFile(this, "Add the following keys that are required: " + Joiner.on(", ").join(missingKeys) + ".");
+
+      if (missingKeys.size() > 0) {
+        addFileIssue("Add the following keys that are required: " + Joiner.on(", ").join(missingKeys) + ".");
       }
-      definedKeys.clear();
-      missingKeys.clear();
     }
   }
+
+  @Override
+  public void visitKey(KeyTree key) {
+    definedKeys.add(key.actualText());
+    super.visitKey(key);
+  }
+
 }

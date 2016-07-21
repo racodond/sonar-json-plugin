@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,49 +13,50 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.checks.puppet;
 
-import java.io.File;
-
 import org.junit.Test;
-import org.sonar.json.JSONAstScanner;
-import org.sonar.squidbridge.api.SourceFile;
-import org.sonar.squidbridge.checks.CheckMessagesVerifier;
+import org.sonar.json.checks.CheckTestUtils;
+import org.sonar.json.checks.verifier.JSONCheckVerifier;
 
 public class PuppetRequiredKeysCheckTest {
 
-  private PuppetRequiredKeysCheck check = new PuppetRequiredKeysCheck();
-
   @Test
   public void should_define_all_the_keys_and_not_raise_any_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/required-keys/no-missing-keys/metadata.json"), check);
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+    JSONCheckVerifier.issues(
+      new PuppetRequiredKeysCheck(),
+      CheckTestUtils.getTestFile("puppet/required-keys/no-missing-keys/metadata.json"))
+      .noMore();
   }
 
   @Test
   public void should_not_define_some_keys_and_raise_an_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/required-keys/missing-keys/metadata.json"), check);
-    CheckMessagesVerifier.verify(file.getCheckMessages()).next()
-      .withMessage("Add the following keys that are required: author, license.")
+    JSONCheckVerifier.issues(
+      new PuppetRequiredKeysCheck(),
+      CheckTestUtils.getTestFile("puppet/required-keys/missing-keys/metadata.json"))
+      .next().withMessage("Add the following keys that are required: author, license.")
       .noMore();
   }
 
   @Test
   public void should_be_an_empty_file_and_raise_an_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/required-keys/empty-file/metadata.json"), check);
-    CheckMessagesVerifier.verify(file.getCheckMessages()).next()
-      .withMessage("Add the following keys that are required: name, version, author, license, summary, source, dependencies.")
+    JSONCheckVerifier.issues(
+      new PuppetRequiredKeysCheck(),
+      CheckTestUtils.getTestFile("puppet/required-keys/empty-file/metadata.json"))
+      .next().withMessage("Add the following keys that are required: name, version, author, license, summary, source, dependencies.")
       .noMore();
   }
 
   @Test
   public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
-    SourceFile file = JSONAstScanner.scanSingleFile(new File("src/test/resources/checks/puppet/required-keys/not-metadata-json-file/notmetadata.json"), check);
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+    JSONCheckVerifier.issues(
+      new PuppetRequiredKeysCheck(),
+      CheckTestUtils.getTestFile("puppet/required-keys/not-metadata-json-file/notmetadata.json"))
+      .noMore();
   }
 
 }

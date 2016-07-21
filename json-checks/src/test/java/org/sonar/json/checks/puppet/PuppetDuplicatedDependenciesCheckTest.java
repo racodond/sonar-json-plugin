@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,18 +13,15 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.checks.puppet;
 
-import java.io.File;
-
 import org.junit.Test;
-import org.sonar.json.JSONAstScanner;
-import org.sonar.squidbridge.api.SourceFile;
-import org.sonar.squidbridge.checks.CheckMessagesVerifier;
+import org.sonar.json.checks.CheckTestUtils;
+import org.sonar.json.checks.verifier.JSONCheckVerifier;
 
 import static org.hamcrest.Matchers.containsString;
 
@@ -32,45 +29,45 @@ public class PuppetDuplicatedDependenciesCheckTest {
 
   @Test
   public void should_not_define_duplicated_dependencies_and_not_raise_any_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(
-      new File("src/test/resources/checks/puppet/dependencies/valid-dependencies/metadata.json"),
-      new PuppetDuplicatedDependenciesCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+    JSONCheckVerifier.issues(
+      new PuppetDuplicatedDependenciesCheck(),
+      CheckTestUtils.getTestFile("puppet/dependencies/valid-dependencies/metadata.json"))
+      .noMore();
   }
 
   @Test
   public void should_not_define_dependencies_and_not_raise_any_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(
-      new File("src/test/resources/checks/puppet/dependencies/no-dependencies/metadata.json"),
-      new PuppetDuplicatedDependenciesCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+    JSONCheckVerifier.issues(
+      new PuppetDuplicatedDependenciesCheck(),
+      CheckTestUtils.getTestFile("puppet/dependencies/no-dependencies/metadata.json"))
+      .noMore();
   }
 
   @Test
   public void should_define_invalid_dependencies_and_raise_an_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(
-      new File("src/test/resources/checks/puppet/dependencies/invalid-dependencies/metadata.json"),
-      new PuppetDuplicatedDependenciesCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages())
-      .next().atLine(21).withMessage("The \"dependencies\" value is invalid. Define an array instead.").
-      noMore();
+    JSONCheckVerifier.issues(
+      new PuppetDuplicatedDependenciesCheck(),
+      CheckTestUtils.getTestFile("puppet/dependencies/invalid-dependencies/metadata.json"))
+      .next().atLine(21).withMessage("The \"dependencies\" value is invalid. Define an array instead.")
+      .noMore();
   }
 
   @Test
   public void should_define_duplicated_dependencies_and_raise_an_issue() {
-    SourceFile file = JSONAstScanner.scanSingleFile(
-      new File("src/test/resources/checks/puppet/dependencies/duplicated-dependencies/metadata.json"),
-      new PuppetDuplicatedDependenciesCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages())
-      .next().atLine(21).withMessageThat(containsString("Remove the duplicated dependencies:"))
+    JSONCheckVerifier.issues(
+      new PuppetDuplicatedDependenciesCheck(),
+      CheckTestUtils.getTestFile("puppet/dependencies/duplicated-dependencies/metadata.json"))
+      .next().atLine(22).withMessageThat(containsString("Merge those duplicated"))
+      .next().atLine(23).withMessageThat(containsString("Merge those duplicated"))
       .noMore();
   }
 
   @Test
   public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
-    SourceFile file = JSONAstScanner.scanSingleFile(
-      new File("src/test/resources/checks/puppet/dependencies/not-metadata-json-file/notmetadata.json"),
-      new PuppetDuplicatedDependenciesCheck());
-    CheckMessagesVerifier.verify(file.getCheckMessages()).noMore();
+    JSONCheckVerifier.issues(
+      new PuppetDuplicatedDependenciesCheck(),
+      CheckTestUtils.getTestFile("puppet/dependencies/not-metadata-json-file/notmetadata.json"))
+      .noMore();
   }
+
 }

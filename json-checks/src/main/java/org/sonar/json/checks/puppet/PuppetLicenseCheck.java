@@ -1,6 +1,6 @@
 /*
  * SonarQube JSON Plugin
- * Copyright (C) 2015 David RACODON
+ * Copyright (C) 2015-2016 David RACODON
  * david.racodon@gmail.com
  *
  * This program is free software; you can redistribute it and/or
@@ -13,35 +13,32 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.json.checks.puppet;
 
 import com.google.common.collect.ImmutableList;
-import com.sonar.sslr.api.AstNode;
 
 import java.util.List;
 
-import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
-import org.sonar.json.JSONCheck;
-import org.sonar.json.checks.utils.CheckUtils;
 import org.sonar.json.checks.Tags;
-import org.sonar.json.parser.JSONGrammar;
+import org.sonar.plugins.json.api.tree.PairTree;
+import org.sonar.plugins.json.api.tree.StringTree;
+import org.sonar.plugins.json.api.tree.Tree;
+import org.sonar.plugins.json.api.tree.ValueTree;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
-import org.sonar.squidbridge.annotations.SqaleSubCharacteristic;
 
 @Rule(
   key = "puppet-license",
   name = "\"license\" should be valid in Puppet \"metadata.json\" files",
   priority = Priority.MAJOR,
   tags = {Tags.CONVENTION, Tags.PUPPET})
-@SqaleSubCharacteristic(RulesDefinition.SubCharacteristics.DATA_RELIABILITY)
 @SqaleConstantRemediation("5min")
-public class PuppetLicenseCheck extends JSONCheck {
+public class PuppetLicenseCheck extends AbstractPuppetCheck {
 
   private static final List<String> availableLicenses = ImmutableList.of("Glide", "Abstyles", "AFL-1.1", "AFL-1.2", "AFL-2.0", "AFL-2.1", "AFL-3.0", "AMPAS", "APL-1.0",
     "Adobe-Glyph", "APAFML", "Adobe-2006", "AGPL-1.0", "Afmparse", "Aladdin", "ADSL", "AMDPLPA", "ANTLR-PD", "Apache-1.0", "Apache-1.1", "Apache-2.0", "AML", "APSL-1.0",
@@ -67,33 +64,23 @@ public class PuppetLicenseCheck extends JSONCheck {
     "VSL-1.0", "W3C-19980720", "W3C", "Wsuipa", "Xnet", "X11", "Xerox", "XFree86-1.1", "xinetd", "xpp", "XSkat", "YPL-1.0", "YPL-1.1", "Zed", "Zend-2.0", "Zimbra-1.3",
     "Zimbra-1.4", "Zlib", "zlib-acknowledgement", "ZPL-1.1", "ZPL-2.0", "ZPL-2.1");
 
-  private String license = "invalid";
-  private int countLicenseKey = 0;
-
   @Override
-  public void init() {
-    subscribeTo(JSONGrammar.PAIR);
-  }
-
-  @Override
-  public void visitNode(AstNode node) {
-    if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())
-      && "license".equals(CheckUtils.getKeyNodeValue(node.getFirstChild(JSONGrammar.KEY)))) {
-      license = CheckUtils.getValueNodeStringValue(node.getFirstChild(JSONGrammar.VALUE));
-      countLicenseKey++;
-    }
-  }
-
-  @Override
-  public void leaveFile(AstNode node) {
-    if (PuppetCheckUtils.isMetadataJsonFile(getContext().getFile())) {
-      if (countLicenseKey > 1) {
-        addIssueOnFile(this, "Several license definitions have been found. Keep only one license definition.");
-      } else if (countLicenseKey == 1 && !"proprietary".equals(license) && !availableLicenses.contains(license)) {
-        addIssueOnFile(this, "License \"" + license + "\" is not a valid license. Define a valid license.");
+  public void visitPair(PairTree pair) {
+    if ("license".equals(pair.key().actualText())) {
+      if (!pair.value().value().is(Tree.Kind.STRING)) {
+        createIssue(pair.value());
+      } else {
+        if (!"proprietary".equals(((StringTree) pair.value().value()).actualText())
+          && !availableLicenses.contains(((StringTree) pair.value().value()).actualText())) {
+          createIssue(pair.value());
+        }
       }
-      license = "invalid";
-      countLicenseKey = 0;
+      super.visitPair(pair);
     }
   }
+
+  private void createIssue(ValueTree tree) {
+    addPreciseIssue(tree, "Define a valid license.");
+  }
+
 }

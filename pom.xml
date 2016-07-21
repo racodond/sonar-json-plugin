@@ -4,9 +4,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.codehaus.sonar-plugins</groupId>
+    <groupId>org.sonarsource.parent</groupId>
     <artifactId>parent</artifactId>
-    <version>19</version>
+    <version>36</version>
   </parent>
 
   <groupId>org.codehaus.sonar-plugins.json</groupId>
@@ -43,6 +43,7 @@
     <module>json-frontend</module>
     <module>json-checks</module>
     <module>sonar-json-plugin</module>
+    <module>json-checks-testkit</module>
   </modules>
 
   <scm>
@@ -58,19 +59,17 @@
 
   <properties>
     <license.title>SonarQube JSON Plugin</license.title>
+    <license.owner>David RACODON</license.owner>
     <license.mailto>david.racodon@gmail.com</license.mailto>
-
-    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
-
-    <sonar.version>4.5.2</sonar.version>
-    <sslr.version>1.20</sslr.version>
+    <sonar.version>5.6</sonar.version>
+    <sslr.version>1.21</sslr.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>json-squid</artifactId>
+        <artifactId>json-frontend</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -79,33 +78,61 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.codehaus.sonar</groupId>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>json-checks-testkit</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonarsource.sonarqube</groupId>
         <artifactId>sonar-plugin-api</artifactId>
         <version>${sonar.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.codehaus.sonar</groupId>
+        <groupId>org.sonarsource.sonarqube</groupId>
         <artifactId>sonar-testing-harness</artifactId>
         <version>${sonar.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.codehaus.sonar.sslr</groupId>
+        <groupId>org.sonarsource.sslr</groupId>
         <artifactId>sslr-core</artifactId>
         <version>${sslr.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.codehaus.sonar.sslr</groupId>
+        <groupId>org.sonarsource.sslr</groupId>
         <artifactId>sslr-xpath</artifactId>
         <version>${sslr.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.codehaus.sonar.sslr</groupId>
+        <groupId>org.sonarsource.sslr</groupId>
         <artifactId>sslr-testing-harness</artifactId>
         <version>${sslr.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.codehaus.sonar.sslr-squid-bridge</groupId>
+        <groupId>org.sonarsource.sslr-squid-bridge</groupId>
         <artifactId>sslr-squid-bridge</artifactId>
+        <version>2.6.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.sonar.sslr</groupId>
+            <artifactId>sslr-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.sonar</groupId>
+            <artifactId>sonar-plugin-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.sonar.sslr</groupId>
+            <artifactId>sslr-xpath</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
         <version>2.6</version>
       </dependency>
       <dependency>
@@ -150,5 +177,19 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.5.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

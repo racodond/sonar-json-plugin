@@ -4,6 +4,7 @@
   "version": "0.1",
   "version": "1.0.1-beta",
   "version": "abc",
+  "version": [ "0.1" ],
   "author": "Pat",
   "license": "Apache-2.0",
   "summary": "A module for a thing",
