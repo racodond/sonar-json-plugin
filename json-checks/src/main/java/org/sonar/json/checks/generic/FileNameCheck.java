@@ -20,7 +20,9 @@
 package org.sonar.json.checks.generic;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -29,8 +31,8 @@ import org.sonar.check.Rule;
 import org.sonar.check.RuleProperty;
 import org.sonar.json.checks.CheckUtils;
 import org.sonar.json.checks.Tags;
-import org.sonar.plugins.json.api.tree.JsonTree;
-import org.sonar.plugins.json.api.visitors.DoubleDispatchVisitorCheck;
+import org.sonar.plugins.json.api.tree.Tree;
+import org.sonar.plugins.json.api.visitors.SubscriptionVisitorCheck;
 import org.sonar.squidbridge.annotations.ActivatedByDefault;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
 
@@ -41,7 +43,7 @@ import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
   tags = {Tags.CONVENTION})
 @SqaleConstantRemediation("10min")
 @ActivatedByDefault
-public class FileNameCheck extends DoubleDispatchVisitorCheck {
+public class FileNameCheck extends SubscriptionVisitorCheck {
 
   public static final String DEFAULT = "^[A-Za-z][-_A-Za-z0-9]*\\.json$";
 
@@ -51,8 +53,12 @@ public class FileNameCheck extends DoubleDispatchVisitorCheck {
     description = "Regular expression that file names should match. See " + CheckUtils.LINK_TO_JAVA_REGEX_PATTERN_DOC + " for detailed regular expression syntax.")
   private String format = DEFAULT;
 
+  public List<Tree.Kind> nodesToVisit() {
+    return ImmutableList.of(Tree.Kind.JSON);
+  }
+
   @Override
-  public void visitJson(JsonTree tree) {
+  public void visitFile(Tree tree) {
     if (!Pattern.compile(format).matcher(getContext().getFile().getName()).matches()) {
       addFileIssue("Rename this file to match this regular expression: " + format);
     }

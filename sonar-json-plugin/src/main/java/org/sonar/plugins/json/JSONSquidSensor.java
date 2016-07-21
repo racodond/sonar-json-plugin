@@ -29,6 +29,7 @@ import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nullable;
 
 import org.sonar.api.batch.fs.FilePredicate;
 import org.sonar.api.batch.fs.FileSystem;
@@ -50,6 +51,7 @@ import org.sonar.json.visitors.CharsetAwareVisitor;
 import org.sonar.json.visitors.JSONVisitorContext;
 import org.sonar.json.visitors.SyntaxHighlighterVisitor;
 import org.sonar.json.visitors.metrics.MetricsVisitor;
+import org.sonar.plugins.json.api.CustomJSONRulesDefinition;
 import org.sonar.plugins.json.api.JSONCheck;
 import org.sonar.plugins.json.api.tree.JsonTree;
 import org.sonar.plugins.json.api.tree.Tree;
@@ -69,7 +71,7 @@ public class JSONSquidSensor implements Sensor {
   private IssueSaver issueSaver;
   private RuleKey parsingErrorRuleKey = null;
 
-  public JSONSquidSensor(FileSystem fileSystem, CheckFactory checkFactory) {
+  public JSONSquidSensor(FileSystem fileSystem, CheckFactory checkFactory, @Nullable CustomJSONRulesDefinition[] customRulesDefinition) {
     this.fileSystem = fileSystem;
 
     this.mainFilePredicate = fileSystem.predicates().and(
@@ -79,7 +81,8 @@ public class JSONSquidSensor implements Sensor {
     this.parser = JSONParserBuilder.createParser(fileSystem.encoding());
 
     this.checks = JSONChecks.createJSONCheck(checkFactory)
-      .addChecks(CheckList.REPOSITORY_KEY, CheckList.getChecks());
+      .addChecks(CheckList.REPOSITORY_KEY, CheckList.getChecks())
+      .addCustomChecks(customRulesDefinition);
   }
 
   @Override

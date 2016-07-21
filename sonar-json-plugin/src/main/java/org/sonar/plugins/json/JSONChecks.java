@@ -30,6 +30,7 @@ import javax.annotation.Nullable;
 import org.sonar.api.batch.rule.CheckFactory;
 import org.sonar.api.batch.rule.Checks;
 import org.sonar.api.rule.RuleKey;
+import org.sonar.plugins.json.api.CustomJSONRulesDefinition;
 import org.sonar.plugins.json.api.JSONCheck;
 import org.sonar.plugins.json.api.visitors.TreeVisitor;
 
@@ -54,17 +55,16 @@ public class JSONChecks {
     return this;
   }
 
-  /*
-   * public JSONChecks addCustomChecks(@Nullable CustomJSONRulesDefinition[] customRulesDefinitions) {
-   * if (customRulesDefinitions != null) {
-   * 
-   * for (CustomJSONRulesDefinition rulesDefinition : customRulesDefinitions) {
-   * addChecks(rulesDefinition.repositoryKey(), Lists.newArrayList(rulesDefinition.checkClasses()));
-   * }
-   * }
-   * return this;
-   * }
-   */
+  public JSONChecks addCustomChecks(@Nullable CustomJSONRulesDefinition[] customRulesDefinitions) {
+    if (customRulesDefinitions != null) {
+
+      for (CustomJSONRulesDefinition rulesDefinition : customRulesDefinitions) {
+        addChecks(rulesDefinition.repositoryKey(), Lists.newArrayList(rulesDefinition.checkClasses()));
+      }
+    }
+    return this;
+  }
+
   public List<JSONCheck> all() {
     List<JSONCheck> allVisitors = Lists.newArrayList();
 

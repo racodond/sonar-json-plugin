@@ -140,7 +140,7 @@ public class JSONSquidSensorTest {
   }
 
   private JSONSquidSensor createJSONSquidSensor() {
-    return new JSONSquidSensor(context.fileSystem(), checkFactory);
+    return new JSONSquidSensor(context.fileSystem(), checkFactory, null);
   }
 
   private void inputFile(String relativePath) {
