@@ -22,10 +22,12 @@ package org.sonar.json.checks.generic;
 import com.google.common.annotations.VisibleForTesting;
 
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.check.RuleProperty;
+import org.sonar.json.checks.CheckUtils;
 import org.sonar.json.checks.Tags;
 import org.sonar.plugins.json.api.tree.JsonTree;
 import org.sonar.plugins.json.api.visitors.DoubleDispatchVisitorCheck;
@@ -46,13 +48,26 @@ public class FileNameCheck extends DoubleDispatchVisitorCheck {
   @RuleProperty(
     key = "format",
     defaultValue = DEFAULT,
-    description = "Regular expression that file names should match")
+    description = "Regular expression that file names should match. See " + CheckUtils.LINK_TO_JAVA_REGEX_PATTERN_DOC + " for detailed regular expression syntax.")
   private String format = DEFAULT;
 
   @Override
   public void visitJson(JsonTree tree) {
     if (!Pattern.compile(format).matcher(getContext().getFile().getName()).matches()) {
       addFileIssue("Rename this file to match this regular expression: " + format);
+    }
+  }
+
+  @Override
+  public void validateParameters() {
+    try {
+      Pattern.compile(format);
+    } catch (PatternSyntaxException exception) {
+      throw new IllegalStateException(
+        CheckUtils.paramsErrorMessage(
+          this.getClass(),
+          "format parameter \"" + format + "\" is not a valid regular expression."),
+        exception);
     }
   }
 

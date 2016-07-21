@@ -23,6 +23,8 @@ import org.junit.Test;
 import org.sonar.json.checks.CheckTestUtils;
 import org.sonar.json.checks.verifier.JSONCheckVerifier;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 public class FileNameCheckTest {
 
   @Test
@@ -55,6 +57,18 @@ public class FileNameCheckTest {
     JSONCheckVerifier.issues(check, CheckTestUtils.getTestFile("file-name.ko.json"))
       .next().withMessage("Rename this file to match this regular expression: ^[a-z]+\\.json$")
       .noMore();
+  }
+
+  @Test
+  public void should_throw_an_illegal_state_exception_as_the_format_parameter_regular_expression_is_not_valid() {
+    try {
+      FileNameCheck check = new FileNameCheck();
+      check.setFormat("(");
+      JSONCheckVerifier.issues(check, CheckTestUtils.getTestFile("sample.json")).noMore();
+    } catch (IllegalStateException e) {
+      assertThat(e.getMessage()).isEqualTo("Check json:S1578 (File names should comply with a naming convention): " +
+        "format parameter \"(\" is not a valid regular expression.");
+    }
   }
 
 }

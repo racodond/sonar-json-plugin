@@ -23,6 +23,8 @@ import org.junit.Test;
 import org.sonar.json.checks.CheckTestUtils;
 import org.sonar.json.checks.verifier.JSONCheckVerifier;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 public class KeyRegularExpressionCheckTest {
 
   @Test
@@ -36,6 +38,18 @@ public class KeyRegularExpressionCheckTest {
       .next().atLine(4).withMessage("blabla...")
       .next().atLine(6).withMessage("blabla...")
       .noMore();
+  }
+
+  @Test
+  public void should_throw_an_illegal_state_exception_as_the_regular_expression_parameter_is_not_valid() {
+    try {
+      KeyRegularExpressionCheck check = new KeyRegularExpressionCheck();
+      check.setRegularExpression("(");
+      JSONCheckVerifier.issues(check, CheckTestUtils.getTestFile("keyRegularExpression.json")).noMore();
+    } catch (IllegalStateException e) {
+      assertThat(e.getMessage()).isEqualTo("Check json:key-regular-expression (Regular expression on key): " +
+        "regularExpression parameter \"(\" is not a valid regular expression.");
+    }
   }
 
 }
