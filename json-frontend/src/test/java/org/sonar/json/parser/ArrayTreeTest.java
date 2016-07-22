@@ -37,7 +37,6 @@ public class ArrayTreeTest {
     tree = parse("[]");
     assertThat(tree.leftBracket()).isNotNull();
     assertThat(tree.rightBracket()).isNotNull();
-    assertThat(tree.elementSyntaxList()).isNull();
     assertThat(tree.elements().size()).isEqualTo(0);
 
     tree = parse(" []");
@@ -54,7 +53,6 @@ public class ArrayTreeTest {
 
     tree = parse("  [ \"abc\" ]");
     assertThat(tree.elements().size()).isEqualTo(1);
-    assertThat(tree.elementSyntaxList()).isNotNull();
     assertTrue(tree.elements().get(0).value().is(Tree.Kind.STRING));
 
     tree = parse("  [ \"abc\", \"def\" ]");

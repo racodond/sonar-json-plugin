@@ -20,16 +20,10 @@
 package org.sonar.plugins.json.api.tree;
 
 import java.util.List;
-import javax.annotation.Nullable;
-
-import org.sonar.json.tree.impl.SyntaxList;
 
 public interface ArrayTree extends Tree {
 
   SyntaxToken leftBracket();
-
-  @Nullable
-  SyntaxList<ValueTree> elementSyntaxList();
 
   List<ValueTree> elements();
 

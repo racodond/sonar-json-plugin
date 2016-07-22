@@ -37,7 +37,6 @@ public class ObjectTreeTest {
     tree = parse("{}");
     assertThat(tree.leftBrace()).isNotNull();
     assertThat(tree.rightBrace()).isNotNull();
-    assertThat(tree.pairSyntaxList()).isNull();
     assertThat(tree.pairs().size()).isEqualTo(0);
 
     tree = parse(" {}");
@@ -54,7 +53,6 @@ public class ObjectTreeTest {
 
     tree = parse("  { \"abc\": 1 }");
     assertThat(tree.pairs().size()).isEqualTo(1);
-    assertThat(tree.pairSyntaxList()).isNotNull();
     assertTrue(tree.pairs().get(0).is(Tree.Kind.PAIR));
     assertThat(tree.pairs().get(0).key().actualText()).isEqualTo("abc");
     assertTrue(tree.pairs().get(0).value().value().is(Tree.Kind.NUMBER));

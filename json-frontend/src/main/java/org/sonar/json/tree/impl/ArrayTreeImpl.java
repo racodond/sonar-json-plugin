@@ -56,8 +56,9 @@ public class ArrayTreeImpl extends JSONTree implements ArrayTree {
   @Override
   public Iterator<Tree> childrenIterator() {
     return Iterators.concat(
-      Iterators.forArray(leftBracket, rightBracket),
-      allTrees.iterator());
+      Iterators.singletonIterator(leftBracket),
+      allTrees.iterator(),
+      Iterators.singletonIterator(rightBracket));
   }
 
   @Override
@@ -68,12 +69,6 @@ public class ArrayTreeImpl extends JSONTree implements ArrayTree {
   @Override
   public SyntaxToken leftBracket() {
     return leftBracket;
-  }
-
-  @Nullable
-  @Override
-  public SyntaxList<ValueTree> elementSyntaxList() {
-    return elementSyntaxList;
   }
 
   @Override

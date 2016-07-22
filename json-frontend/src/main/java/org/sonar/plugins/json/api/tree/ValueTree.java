@@ -21,6 +21,6 @@ package org.sonar.plugins.json.api.tree;
 
 public interface ValueTree extends Tree {
 
-    Tree value();
-    
+  Tree value();
+
 }

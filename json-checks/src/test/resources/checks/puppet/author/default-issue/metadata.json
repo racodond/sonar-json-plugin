@@ -2,7 +2,10 @@
   "name": "examplecorp-mymodule",
   "version": "0.0.1",
   "author": "Pat",
-  "author": { "John Doe": 1 },
+  "author": [
+    "abc",
+    "def"
+  ],
   "license": "Apache-2.0",
   "summary": "A module for a thing",
   "source": "https://github.com/examplecorp/examplecorp-mymodule",
