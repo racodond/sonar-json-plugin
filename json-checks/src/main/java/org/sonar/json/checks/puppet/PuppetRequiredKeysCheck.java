@@ -30,6 +30,7 @@ import org.sonar.check.Rule;
 import org.sonar.json.checks.Tags;
 import org.sonar.plugins.json.api.tree.JsonTree;
 import org.sonar.plugins.json.api.tree.KeyTree;
+import org.sonar.plugins.json.api.visitors.DoubleDispatchVisitorCheck;
 import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
 
 @Rule(
@@ -38,7 +39,7 @@ import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
   priority = Priority.MAJOR,
   tags = {Tags.CONVENTION, Tags.PUPPET})
 @SqaleConstantRemediation("10min")
-public class PuppetRequiredKeysCheck extends AbstractPuppetCheck {
+public class PuppetRequiredKeysCheck extends DoubleDispatchVisitorCheck {
 
   private static final List<String> REQUIRED_KEYS = ImmutableList.of("name", "version", "author", "license", "summary", "source", "dependencies");
   private final List<String> definedKeys = new ArrayList<>();
