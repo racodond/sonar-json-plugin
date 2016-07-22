@@ -40,7 +40,7 @@ import org.sonar.squidbridge.annotations.SqaleConstantRemediation;
 @SqaleConstantRemediation("5min")
 public class PuppetLicenseCheck extends AbstractPuppetCheck {
 
-  private static final List<String> availableLicenses = ImmutableList.of("Glide", "Abstyles", "AFL-1.1", "AFL-1.2", "AFL-2.0", "AFL-2.1", "AFL-3.0", "AMPAS", "APL-1.0",
+  public static final List<String> AVAILABLE_LICENSES = ImmutableList.of("Glide", "Abstyles", "AFL-1.1", "AFL-1.2", "AFL-2.0", "AFL-2.1", "AFL-3.0", "AMPAS", "APL-1.0",
     "Adobe-Glyph", "APAFML", "Adobe-2006", "AGPL-1.0", "Afmparse", "Aladdin", "ADSL", "AMDPLPA", "ANTLR-PD", "Apache-1.0", "Apache-1.1", "Apache-2.0", "AML", "APSL-1.0",
     "APSL-1.1", "APSL-1.2", "APSL-2.0", "Artistic-1.0", "Artistic-1.0-Perl", "Artistic-1.0-cl8", "Artistic-2.0", "AAL", "Bahyph", "Barr", "Beerware", "BitTorrent-1.0",
     "BitTorrent-1.1", "BSL-1.0", "Borceux", "BSD-2-Clause", "BSD-2-Clause-FreeBSD", "BSD-2-Clause-NetBSD", "BSD-3-Clause", "BSD-3-Clause-Clear", "BSD-4-Clause", "BSD-Protection",
@@ -71,7 +71,7 @@ public class PuppetLicenseCheck extends AbstractPuppetCheck {
         createIssue(pair.value());
       } else {
         if (!"proprietary".equals(((StringTree) pair.value().value()).actualText())
-          && !availableLicenses.contains(((StringTree) pair.value().value()).actualText())) {
+          && !AVAILABLE_LICENSES.contains(((StringTree) pair.value().value()).actualText())) {
           createIssue(pair.value());
         }
       }

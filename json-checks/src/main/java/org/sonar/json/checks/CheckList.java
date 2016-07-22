@@ -49,7 +49,6 @@ public final class CheckList {
       PuppetLicenseCheck.class,
       PuppetRequiredKeysCheck.class,
       PuppetVersionCheck.class,
-      TabCharacterCheck.class
-      );
+      TabCharacterCheck.class);
   }
 }
