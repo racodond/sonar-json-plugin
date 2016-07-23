@@ -10,7 +10,7 @@ Plugin versions and compatibility with SonarQube versions: [http://docs.sonarqub
 This plugin enables code QA analysis of [JSON files](http://json.org/) within [SonarQube](http://www.sonarqube.org):
 
  * Computes metrics: lines of code, statements, etc.
- * Performs more than 12 checks
+ * Performs more than [12 checks](#available-checks)
  * Provide the ability to write your own checks
 
 ## Usage
