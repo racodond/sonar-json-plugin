@@ -139,7 +139,7 @@ public class CheckVerifier {
         Collections.sort(current.secondaryLines());
         Arrays.sort(expectedLines);
 
-        int i = 0;
+        int i;
         for (i = 0; i < expectedLines.length; i++) {
             if (current.secondaryLines().size() <= i) {
                 throw new AssertionError("\nMissing secondary location at line " + expectedLines[i]);
