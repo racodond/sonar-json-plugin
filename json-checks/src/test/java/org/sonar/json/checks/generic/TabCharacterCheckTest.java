@@ -27,14 +27,14 @@ public class TabCharacterCheckTest {
 
   @Test
   public void should_find_tab_characters_and_raise_an_issue() {
-    JSONCheckVerifier.issues(new TabCharacterCheck(), CheckTestUtils.getTestFile("tabCharacter.json"))
+    JSONCheckVerifier.verify(new TabCharacterCheck(), CheckTestUtils.getTestFile("tabCharacter.json"))
       .next().withMessage("Replace all tab characters in this file by sequences of whitespaces.")
       .noMore();
   }
 
   @Test
   public void should_not_find_tab_characters_and_not_raise_an_issue() {
-    JSONCheckVerifier.issues(new TabCharacterCheck(), CheckTestUtils.getTestFile("sample.json"))
+    JSONCheckVerifier.verify(new TabCharacterCheck(), CheckTestUtils.getTestFile("sample.json"))
       .noMore();
   }
 

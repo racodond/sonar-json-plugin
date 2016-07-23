@@ -28,23 +28,23 @@ public class BOMCheckTest {
 
   @Test
   public void should_find_a_BOM_in_UTF8_file_and_raise_an_issue() {
-    JSONCheckVerifier.issues(new BOMCheck(), CheckTestUtils.getTestFile("utf8WithBOM.json"))
+    JSONCheckVerifier.verify(new BOMCheck(), CheckTestUtils.getTestFile("utf8WithBOM.json"))
       .next().withMessage("Remove the BOM.")
       .noMore();
   }
 
   @Test
   public void should_find_a_BOM_in_UTF16_files_but_not_raise_any_issue() {
-    JSONCheckVerifier.issues(new BOMCheck(), CheckTestUtils.getTestFile("utf16BE.json"), Charsets.UTF_16BE)
+    JSONCheckVerifier.verify(new BOMCheck(), CheckTestUtils.getTestFile("utf16BE.json"), Charsets.UTF_16BE)
       .noMore();
 
-    JSONCheckVerifier.issues(new BOMCheck(), CheckTestUtils.getTestFile("utf16LE.json"), Charsets.UTF_16LE)
+    JSONCheckVerifier.verify(new BOMCheck(), CheckTestUtils.getTestFile("utf16LE.json"), Charsets.UTF_16LE)
       .noMore();
   }
 
   @Test
   public void should_not_find_a_BOM_in_UTF8_file_and_not_raise_any_issue() {
-    JSONCheckVerifier.issues(new BOMCheck(), CheckTestUtils.getTestFile("sample.json"), Charsets.UTF_8)
+    JSONCheckVerifier.verify(new BOMCheck(), CheckTestUtils.getTestFile("sample.json"), Charsets.UTF_8)
       .noMore();
   }
 

@@ -27,34 +27,34 @@ public class PuppetLicenseCheckTest {
 
   @Test
   public void should_define_a_valid_license_listed_by_SPDX_and_not_raise_any_issue() {
-    JSONCheckVerifier.issues(
-      new PuppetLicenseCheck(),
-      CheckTestUtils.getTestFile("puppet/license/valid-spdx/metadata.json"))
+    JSONCheckVerifier.verify(
+        new PuppetLicenseCheck(),
+        CheckTestUtils.getTestFile("puppet/license/valid-spdx/metadata.json"))
       .noMore();
   }
 
   @Test
   public void should_define_a_valid_proprietary_license_and_not_raise_any_issue() {
-    JSONCheckVerifier.issues(
-      new PuppetLicenseCheck(),
-      CheckTestUtils.getTestFile("puppet/license/valid-proprietary/metadata.json"))
+    JSONCheckVerifier.verify(
+        new PuppetLicenseCheck(),
+        CheckTestUtils.getTestFile("puppet/license/valid-proprietary/metadata.json"))
       .noMore();
   }
 
   @Test
   public void should_define_an_invalid_license_and_raise_an_issue() {
-    JSONCheckVerifier.issues(
-      new PuppetLicenseCheck(),
-      CheckTestUtils.getTestFile("puppet/license/invalid/metadata.json"))
-      .next().atLine(5).withMessage("Define a valid license.")
+    JSONCheckVerifier.verify(
+        new PuppetLicenseCheck(),
+        CheckTestUtils.getTestFile("puppet/license/invalid/metadata.json"))
+      .next().startAtLine(5).startAtColumn(14).endAtLine(5).endAtColumn(22).withMessage("Define a valid license.")
       .noMore();
   }
 
   @Test
   public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
-    JSONCheckVerifier.issues(
-      new PuppetLicenseCheck(),
-      CheckTestUtils.getTestFile("puppet/license/not-metadata-json-file/notmetadata.json"))
+    JSONCheckVerifier.verify(
+        new PuppetLicenseCheck(),
+        CheckTestUtils.getTestFile("puppet/license/not-metadata-json-file/notmetadata.json"))
       .noMore();
   }
 

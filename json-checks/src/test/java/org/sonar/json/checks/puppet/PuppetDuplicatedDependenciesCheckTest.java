@@ -29,7 +29,7 @@ public class PuppetDuplicatedDependenciesCheckTest {
 
   @Test
   public void should_not_define_duplicated_dependencies_and_not_raise_any_issue() {
-    JSONCheckVerifier.issues(
+    JSONCheckVerifier.verify(
       new PuppetDuplicatedDependenciesCheck(),
       CheckTestUtils.getTestFile("puppet/dependencies/valid-dependencies/metadata.json"))
       .noMore();
@@ -37,7 +37,7 @@ public class PuppetDuplicatedDependenciesCheckTest {
 
   @Test
   public void should_not_define_dependencies_and_not_raise_any_issue() {
-    JSONCheckVerifier.issues(
+    JSONCheckVerifier.verify(
       new PuppetDuplicatedDependenciesCheck(),
       CheckTestUtils.getTestFile("puppet/dependencies/no-dependencies/metadata.json"))
       .noMore();
@@ -45,26 +45,26 @@ public class PuppetDuplicatedDependenciesCheckTest {
 
   @Test
   public void should_define_invalid_dependencies_and_raise_an_issue() {
-    JSONCheckVerifier.issues(
+    JSONCheckVerifier.verify(
       new PuppetDuplicatedDependenciesCheck(),
       CheckTestUtils.getTestFile("puppet/dependencies/invalid-dependencies/metadata.json"))
-      .next().atLine(21).withMessage("The \"dependencies\" value is invalid. Define an array instead.")
+      .next().startAtLine(21).startAtColumn(19).endAtLine(21).endAtColumn(24).withMessage("The \"dependencies\" value is invalid. Define an array instead.")
       .noMore();
   }
 
   @Test
   public void should_define_duplicated_dependencies_and_raise_an_issue() {
-    JSONCheckVerifier.issues(
+    JSONCheckVerifier.verify(
       new PuppetDuplicatedDependenciesCheck(),
       CheckTestUtils.getTestFile("puppet/dependencies/duplicated-dependencies/metadata.json"))
-      .next().atLine(22).withMessageThat(containsString("Merge those duplicated"))
-      .next().atLine(23).withMessageThat(containsString("Merge those duplicated"))
+      .next().startAtLine(22).startAtColumn(15).endAtLine(22).endAtColumn(34).withSecondaryLines(24).withMessageThat(containsString("Merge those duplicated"))
+      .next().startAtLine(23).startAtColumn(15).endAtLine(23).endAtColumn(36).withSecondaryLines(25, 26).withMessageThat(containsString("Merge those duplicated"))
       .noMore();
   }
 
   @Test
   public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
-    JSONCheckVerifier.issues(
+    JSONCheckVerifier.verify(
       new PuppetDuplicatedDependenciesCheck(),
       CheckTestUtils.getTestFile("puppet/dependencies/not-metadata-json-file/notmetadata.json"))
       .noMore();

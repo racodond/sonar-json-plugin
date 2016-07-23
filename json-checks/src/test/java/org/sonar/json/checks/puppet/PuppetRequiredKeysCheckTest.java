@@ -27,35 +27,35 @@ public class PuppetRequiredKeysCheckTest {
 
   @Test
   public void should_define_all_the_keys_and_not_raise_any_issue() {
-    JSONCheckVerifier.issues(
-      new PuppetRequiredKeysCheck(),
-      CheckTestUtils.getTestFile("puppet/required-keys/no-missing-keys/metadata.json"))
+    JSONCheckVerifier.verify(
+        new PuppetRequiredKeysCheck(),
+        CheckTestUtils.getTestFile("puppet/required-keys/no-missing-keys/metadata.json"))
       .noMore();
   }
 
   @Test
   public void should_not_define_some_keys_and_raise_an_issue() {
-    JSONCheckVerifier.issues(
-      new PuppetRequiredKeysCheck(),
-      CheckTestUtils.getTestFile("puppet/required-keys/missing-keys/metadata.json"))
+    JSONCheckVerifier.verify(
+        new PuppetRequiredKeysCheck(),
+        CheckTestUtils.getTestFile("puppet/required-keys/missing-keys/metadata.json"))
       .next().withMessage("Add the following keys that are required: author, license.")
       .noMore();
   }
 
   @Test
   public void should_be_an_empty_file_and_raise_an_issue() {
-    JSONCheckVerifier.issues(
-      new PuppetRequiredKeysCheck(),
-      CheckTestUtils.getTestFile("puppet/required-keys/empty-file/metadata.json"))
+    JSONCheckVerifier.verify(
+        new PuppetRequiredKeysCheck(),
+        CheckTestUtils.getTestFile("puppet/required-keys/empty-file/metadata.json"))
       .next().withMessage("Add the following keys that are required: name, version, author, license, summary, source, dependencies.")
       .noMore();
   }
 
   @Test
   public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
-    JSONCheckVerifier.issues(
-      new PuppetRequiredKeysCheck(),
-      CheckTestUtils.getTestFile("puppet/required-keys/not-metadata-json-file/notmetadata.json"))
+    JSONCheckVerifier.verify(
+        new PuppetRequiredKeysCheck(),
+        CheckTestUtils.getTestFile("puppet/required-keys/not-metadata-json-file/notmetadata.json"))
       .noMore();
   }
 

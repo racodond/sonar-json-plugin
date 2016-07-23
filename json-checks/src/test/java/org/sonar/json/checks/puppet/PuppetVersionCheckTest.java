@@ -29,21 +29,21 @@ public class PuppetVersionCheckTest {
   public void should_define_some_invalid_versions_and_raise_some_issues() {
     String message = "Define the version as a semantic version on 3 digits separated by dots: ^\\d+\\.\\d+\\.\\d+$";
 
-    JSONCheckVerifier.issues(
-      new PuppetVersionCheck(),
-      CheckTestUtils.getTestFile("puppet/version/metadata.json"))
-      .next().atLine(4).withMessage(message)
-      .next().atLine(5).withMessage(message)
-      .next().atLine(6).withMessage(message)
-      .next().atLine(7).withMessage(message)
+    JSONCheckVerifier.verify(
+        new PuppetVersionCheck(),
+        CheckTestUtils.getTestFile("puppet/version/metadata.json"))
+      .next().startAtLine(4).startAtColumn(14).endAtLine(4).endAtColumn(19).withMessage(message)
+      .next().startAtLine(5).startAtColumn(14).endAtLine(5).endAtColumn(26).withMessage(message)
+      .next().startAtLine(6).startAtColumn(14).endAtLine(6).endAtColumn(19).withMessage(message)
+      .next().startAtLine(7).startAtColumn(14).endAtLine(7).endAtColumn(23).withMessage(message)
       .noMore();
   }
 
   @Test
   public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
-    JSONCheckVerifier.issues(
-      new PuppetVersionCheck(),
-      CheckTestUtils.getTestFile("puppet/version/notmetadata.json"))
+    JSONCheckVerifier.verify(
+        new PuppetVersionCheck(),
+        CheckTestUtils.getTestFile("puppet/version/notmetadata.json"))
       .noMore();
   }
 

@@ -23,10 +23,16 @@ import com.google.common.base.Charsets;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
+import org.sonar.json.parser.JSONParserBuilder;
 import org.sonar.json.visitors.CharsetAwareVisitor;
+import org.sonar.json.visitors.JSONVisitorContext;
 import org.sonar.plugins.json.api.JSONCheck;
-import org.sonar.squidbridge.checks.CheckMessagesVerifier;
+import org.sonar.plugins.json.api.tree.JsonTree;
+import org.sonar.plugins.json.api.visitors.issue.*;
 
 /**
  * To unit test checks.
@@ -37,32 +43,77 @@ public class JSONCheckVerifier {
   }
 
   /**
-   * Check issues
+   * Check verify
    * @param check Check to test
    * @param file File to test
    *
    * Example:
    * <pre>
-   * JSONCheckVerifier.issues(new MyCheck(), myFile, Charsets.UTF_8))
-   *    .next().atLine(2).withMessage("This is message for line 2.")
-   *    .next().atLine(3).withMessage("This is message for line 3.").withCost(2.)
-   *    .next().atLine(8)
+   * JSONCheckVerifier.verify(new MyCheck(), myFile, Charsets.UTF_8))
+   *    .next().startAtLine(2).withMessage("This is message for line 2.")
+   *    .next().startAtLine(3).withMessage("This is message for line 3.").withCost(2.)
+   *    .next().startAtLine(8).startAtColumn(4)
    *    .noMore();
    * </pre>
    */
-  public static CheckMessagesVerifier issues(JSONCheck check, File file) {
-    return issues(check, file, Charsets.UTF_8);
+  public static CheckVerifier verify(JSONCheck check, File file) {
+    return verify(check, file, Charsets.UTF_8);
   }
 
   /**
-   * See {@link JSONCheckVerifier#issues(JSONCheck, File)}
+   * See {@link JSONCheckVerifier#verify(JSONCheck, File)}
    * @param charset Charset of the file to test.
    */
-  public static CheckMessagesVerifier issues(JSONCheck check, File file, Charset charset) {
+  public static CheckVerifier verify(JSONCheck check, File file, Charset charset) {
     if (check instanceof CharsetAwareVisitor) {
       ((CharsetAwareVisitor) check).setCharset(charset);
     }
-    return CheckMessagesVerifier.verify(TreeCheckTest.getIssues(file.getAbsolutePath(), check, charset));
+    return CheckVerifier.verify(getTestIssues(file.getAbsolutePath(), check, charset));
+  }
+
+  private static Collection<TestIssue> getTestIssues(String relativePath, JSONCheck check, Charset charset) {
+    File file = new File(relativePath);
+
+    JsonTree jsonTree = (JsonTree) JSONParserBuilder.createParser(charset).parse(file);
+    JSONVisitorContext context = new JSONVisitorContext(jsonTree, file);
+    List<Issue> issues = check.scanFile(context);
+
+    List<TestIssue> testIssues = new ArrayList<>();
+    for (Issue issue : issues) {
+      TestIssue testIssue;
+
+      if (issue instanceof FileIssue) {
+        FileIssue fileIssue = (FileIssue) issue;
+        testIssue = new TestIssue(fileIssue.message());
+        for (IssueLocation issueLocation : fileIssue.secondaryLocations()) {
+          testIssue.addSecondaryLine(issueLocation.startLine());
+        }
+
+      } else if (issue instanceof LineIssue) {
+        LineIssue lineIssue = (LineIssue) issue;
+        testIssue = new TestIssue(lineIssue.message())
+          .starLine(lineIssue.line());
+
+      } else {
+        PreciseIssue preciseIssue = (PreciseIssue) issue;
+        testIssue = new TestIssue(preciseIssue.primaryLocation().message())
+          .starLine(preciseIssue.primaryLocation().startLine())
+          .startColumn(preciseIssue.primaryLocation().startLineOffset() + 1)
+          .endLine(preciseIssue.primaryLocation().endLine())
+          .endColumn(preciseIssue.primaryLocation().endLineOffset() + 1);
+        for (IssueLocation issueLocation : preciseIssue.secondaryLocations()) {
+          testIssue.addSecondaryLine(issueLocation.startLine());
+        }
+      }
+
+      if (issue.cost() != null) {
+        testIssue.cost(issue.cost());
+      }
+
+      testIssues.add(testIssue);
+    }
+
+    return testIssues;
   }
 
 }

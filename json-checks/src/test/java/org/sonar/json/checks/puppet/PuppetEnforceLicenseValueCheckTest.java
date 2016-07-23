@@ -29,9 +29,9 @@ public class PuppetEnforceLicenseValueCheckTest {
 
   @Test
   public void should_match_the_default_required_value_and_not_raise_any_issue() {
-    JSONCheckVerifier.issues(
-      new PuppetEnforceLicenseValueCheck(),
-      CheckTestUtils.getTestFile("puppet/license/valid-spdx/metadata.json"))
+    JSONCheckVerifier.verify(
+        new PuppetEnforceLicenseValueCheck(),
+        CheckTestUtils.getTestFile("puppet/license/valid-spdx/metadata.json"))
       .noMore();
   }
 
@@ -40,19 +40,19 @@ public class PuppetEnforceLicenseValueCheckTest {
     PuppetEnforceLicenseValueCheck check = new PuppetEnforceLicenseValueCheck();
     check.setLicense("blabla");
 
-    JSONCheckVerifier.issues(
-      check,
-      CheckTestUtils.getTestFile("puppet/license/match-required-value-custom/metadata.json"))
+    JSONCheckVerifier.verify(
+        check,
+        CheckTestUtils.getTestFile("puppet/license/match-required-value-custom/metadata.json"))
       .noMore();
   }
 
   @Test
   public void should_not_match_the_required_default_value_and_raise_an_issue() {
-    JSONCheckVerifier.issues(
-      new PuppetEnforceLicenseValueCheck(),
-      CheckTestUtils.getTestFile("puppet/license/match-required-value/metadata.json"))
-      .next().atLine(5).withMessage(DEFAULT_MESSAGE)
-      .next().atLine(6).withMessage(DEFAULT_MESSAGE)
+    JSONCheckVerifier.verify(
+        new PuppetEnforceLicenseValueCheck(),
+        CheckTestUtils.getTestFile("puppet/license/match-required-value/metadata.json"))
+      .next().startAtLine(5).startAtColumn(14).endAtLine(5).endAtColumn(22).withMessage(DEFAULT_MESSAGE)
+      .next().startAtLine(6).startAtColumn(14).endAtLine(6).endAtColumn(26).withMessage(DEFAULT_MESSAGE)
       .noMore();
   }
 
@@ -61,36 +61,36 @@ public class PuppetEnforceLicenseValueCheckTest {
     PuppetEnforceLicenseValueCheck check = new PuppetEnforceLicenseValueCheck();
     check.setLicense("blabla");
 
-    JSONCheckVerifier.issues(
-      check,
-      CheckTestUtils.getTestFile("puppet/license/valid-spdx/metadata.json"))
-      .next().atLine(5).withMessage("Set the license to \"blabla\".")
+    JSONCheckVerifier.verify(
+        check,
+        CheckTestUtils.getTestFile("puppet/license/valid-spdx/metadata.json"))
+      .next().startAtLine(5).startAtColumn(14).endAtLine(5).endAtColumn(24).withMessage("Set the license to \"blabla\".")
       .noMore();
   }
 
   @Test
   public void should_not_be_triggered_when_no_license_is_defined() {
-    JSONCheckVerifier.issues(
-      new PuppetEnforceLicenseValueCheck(),
-      CheckTestUtils.getTestFile("puppet/license/no-license/metadata.json"))
+    JSONCheckVerifier.verify(
+        new PuppetEnforceLicenseValueCheck(),
+        CheckTestUtils.getTestFile("puppet/license/no-license/metadata.json"))
       .noMore();
   }
 
   @Test
   public void should_raise_two_issues() {
-    JSONCheckVerifier.issues(
-      new PuppetEnforceLicenseValueCheck(),
-      CheckTestUtils.getTestFile("puppet/license/two-licenses/metadata.json"))
-      .next().atLine(5).withMessage(DEFAULT_MESSAGE)
-      .next().atLine(6).withMessage(DEFAULT_MESSAGE)
+    JSONCheckVerifier.verify(
+        new PuppetEnforceLicenseValueCheck(),
+        CheckTestUtils.getTestFile("puppet/license/two-licenses/metadata.json"))
+      .next().startAtLine(5).startAtColumn(14).endAtLine(5).endAtColumn(26).withMessage(DEFAULT_MESSAGE)
+      .next().startAtLine(6).startAtColumn(14).endAtLine(6).endAtColumn(26).withMessage(DEFAULT_MESSAGE)
       .noMore();
   }
 
   @Test
   public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
-    JSONCheckVerifier.issues(
-      new PuppetEnforceLicenseValueCheck(),
-      CheckTestUtils.getTestFile("puppet/license/not-metadata-json-file/notmetadata.json"))
+    JSONCheckVerifier.verify(
+        new PuppetEnforceLicenseValueCheck(),
+        CheckTestUtils.getTestFile("puppet/license/not-metadata-json-file/notmetadata.json"))
       .noMore();
   }
 

@@ -33,10 +33,10 @@ public class KeyRegularExpressionCheckTest {
     check.setRegularExpression(".*mykey.*");
     check.setMessage("blabla...");
 
-    JSONCheckVerifier.issues(check, CheckTestUtils.getTestFile("keyRegularExpression.json"))
-      .next().atLine(2).withMessage("blabla...")
-      .next().atLine(4).withMessage("blabla...")
-      .next().atLine(6).withMessage("blabla...")
+    JSONCheckVerifier.verify(check, CheckTestUtils.getTestFile("keyRegularExpression.json"))
+      .next().startAtLine(2).startAtColumn(3).endAtLine(2).endAtColumn(10).withMessage("blabla...")
+      .next().startAtLine(4).startAtColumn(3).endAtLine(4).endAtColumn(24).withMessage("blabla...")
+      .next().startAtLine(6).startAtColumn(26).endAtLine(6).endAtColumn(33).withMessage("blabla...")
       .noMore();
   }
 
@@ -45,7 +45,7 @@ public class KeyRegularExpressionCheckTest {
     try {
       KeyRegularExpressionCheck check = new KeyRegularExpressionCheck();
       check.setRegularExpression("(");
-      JSONCheckVerifier.issues(check, CheckTestUtils.getTestFile("keyRegularExpression.json")).noMore();
+      JSONCheckVerifier.verify(check, CheckTestUtils.getTestFile("keyRegularExpression.json")).noMore();
     } catch (IllegalStateException e) {
       assertThat(e.getMessage()).isEqualTo("Check json:key-regular-expression (Regular expression on key): " +
         "regularExpression parameter \"(\" is not a valid regular expression.");

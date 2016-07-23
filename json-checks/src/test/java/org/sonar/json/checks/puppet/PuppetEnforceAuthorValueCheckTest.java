@@ -27,9 +27,9 @@ public class PuppetEnforceAuthorValueCheckTest {
 
   @Test
   public void should_match_the_default_required_value_and_not_raise_any_issue() {
-    JSONCheckVerifier.issues(
-      new PuppetEnforceAuthorValueCheck(),
-      CheckTestUtils.getTestFile("puppet/author/default/metadata.json"))
+    JSONCheckVerifier.verify(
+        new PuppetEnforceAuthorValueCheck(),
+        CheckTestUtils.getTestFile("puppet/author/default/metadata.json"))
       .noMore();
   }
 
@@ -38,19 +38,19 @@ public class PuppetEnforceAuthorValueCheckTest {
     PuppetEnforceAuthorValueCheck check = new PuppetEnforceAuthorValueCheck();
     check.setAuthor("Pat");
 
-    JSONCheckVerifier.issues(
-      check,
-      CheckTestUtils.getTestFile("puppet/author/custom/metadata.json"))
+    JSONCheckVerifier.verify(
+        check,
+        CheckTestUtils.getTestFile("puppet/author/custom/metadata.json"))
       .noMore();
   }
 
   @Test
   public void should_not_match_the_required_default_value_and_raise_an_issue() {
-    JSONCheckVerifier.issues(
-      new PuppetEnforceAuthorValueCheck(),
-      CheckTestUtils.getTestFile("puppet/author/default-issue/metadata.json"))
-      .next().atLine(4).withMessage("Set the author to \"John Doe\".")
-      .next().atLine(5).withMessage("Set the author to \"John Doe\".")
+    JSONCheckVerifier.verify(
+        new PuppetEnforceAuthorValueCheck(),
+        CheckTestUtils.getTestFile("puppet/author/default-issue/metadata.json"))
+      .next().startAtLine(4).startAtColumn(13).endAtLine(4).endAtColumn(18).withMessage("Set the author to \"John Doe\".")
+      .next().startAtLine(5).startAtColumn(13).endAtLine(8).endAtColumn(4).withMessage("Set the author to \"John Doe\".")
       .noMore();
   }
 
@@ -59,26 +59,26 @@ public class PuppetEnforceAuthorValueCheckTest {
     PuppetEnforceAuthorValueCheck check = new PuppetEnforceAuthorValueCheck();
     check.setAuthor("Smith");
 
-    JSONCheckVerifier.issues(
-      check,
-      CheckTestUtils.getTestFile("puppet/author/custom/metadata.json"))
-      .next().atLine(4).withMessage("Set the author to \"Smith\".")
+    JSONCheckVerifier.verify(
+        check,
+        CheckTestUtils.getTestFile("puppet/author/custom/metadata.json"))
+      .next().startAtLine(4).startAtColumn(13).endAtLine(4).endAtColumn(18).withMessage("Set the author to \"Smith\".")
       .noMore();
   }
 
   @Test
   public void should_not_be_triggered_when_no_author_is_defined() {
-    JSONCheckVerifier.issues(
-      new PuppetEnforceAuthorValueCheck(),
-      CheckTestUtils.getTestFile("puppet/required-keys/missing-keys/metadata.json"))
+    JSONCheckVerifier.verify(
+        new PuppetEnforceAuthorValueCheck(),
+        CheckTestUtils.getTestFile("puppet/required-keys/missing-keys/metadata.json"))
       .noMore();
   }
 
   @Test
   public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
-    JSONCheckVerifier.issues(
-      new PuppetEnforceAuthorValueCheck(),
-      CheckTestUtils.getTestFile("puppet/author/not-metadata-json-file/notmetadata.json"))
+    JSONCheckVerifier.verify(
+        new PuppetEnforceAuthorValueCheck(),
+        CheckTestUtils.getTestFile("puppet/author/not-metadata-json-file/notmetadata.json"))
       .noMore();
   }
 

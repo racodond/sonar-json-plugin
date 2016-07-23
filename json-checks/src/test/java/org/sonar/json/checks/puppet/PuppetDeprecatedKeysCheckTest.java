@@ -27,16 +27,16 @@ public class PuppetDeprecatedKeysCheckTest {
 
   @Test
   public void should_find_some_deprecated_keys_and_raise_some_issues() {
-    JSONCheckVerifier.issues(new PuppetDeprecatedKeysCheck(), CheckTestUtils.getTestFile("puppet/deprecated-keys/metadata.json"))
-      .next().atLine(4).withMessage("Replace this deprecated \"description\" key by the \"summary\" key.")
-      .next().atLine(5).withMessage("Remove this deprecated \"types\" key.")
-      .next().atLine(6).withMessage("Remove this deprecated \"checksums\" key.")
+    JSONCheckVerifier.verify(new PuppetDeprecatedKeysCheck(), CheckTestUtils.getTestFile("puppet/deprecated-keys/metadata.json"))
+      .next().startAtLine(4).startAtColumn(3).endAtLine(4).endAtColumn(16).withMessage("Replace this deprecated \"description\" key by the \"summary\" key.")
+      .next().startAtLine(5).startAtColumn(3).endAtLine(5).endAtColumn(10).withMessage("Remove this deprecated \"types\" key.")
+      .next().startAtLine(6).startAtColumn(3).endAtLine(6).endAtColumn(14).withMessage("Remove this deprecated \"checksums\" key.")
       .noMore();
   }
 
   @Test
   public void should_not_raise_any_issues_because_it_is_not_a_metadata_json_file() {
-    JSONCheckVerifier.issues(new PuppetDeprecatedKeysCheck(), CheckTestUtils.getTestFile("puppet/deprecated-keys/notmetadata.json"))
+    JSONCheckVerifier.verify(new PuppetDeprecatedKeysCheck(), CheckTestUtils.getTestFile("puppet/deprecated-keys/notmetadata.json"))
       .noMore();
   }
 

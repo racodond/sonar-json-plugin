@@ -27,13 +27,13 @@ public class MissingNewLineAtEndOfFileCheckTest {
 
   @Test
   public void should_have_an_empty_new_line_at_the_end_of_the_file_and_not_raise_any_issue() {
-    JSONCheckVerifier.issues(new MissingNewLineAtEndOfFileCheck(), CheckTestUtils.getTestFile("newLineEndOfFile.json"))
+    JSONCheckVerifier.verify(new MissingNewLineAtEndOfFileCheck(), CheckTestUtils.getTestFile("newLineEndOfFile.json"))
       .noMore();
   }
 
   @Test
   public void should_not_have_an_empty_new_line_at_the_end_of_the_file_and_raise_an_issue() {
-    JSONCheckVerifier.issues(new MissingNewLineAtEndOfFileCheck(), CheckTestUtils.getTestFile("noNewLineEndOfFile.json"))
+    JSONCheckVerifier.verify(new MissingNewLineAtEndOfFileCheck(), CheckTestUtils.getTestFile("noNewLineEndOfFile.json"))
       .next().withMessage("Add an empty new line at the end of this file.")
       .noMore();
   }
