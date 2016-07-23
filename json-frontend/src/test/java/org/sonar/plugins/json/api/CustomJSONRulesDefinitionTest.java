@@ -37,7 +37,7 @@ public class CustomJSONRulesDefinitionTest {
 
   @Test
   public void test() {
-    MyCustomJavaPropertiesRulesDefinition rulesDefinition = new MyCustomJavaPropertiesRulesDefinition();
+    MyCustomJSONRulesDefinition rulesDefinition = new MyCustomJSONRulesDefinition();
     RulesDefinition.Context context = new RulesDefinition.Context();
     rulesDefinition.define(context);
     RulesDefinition.Repository repository = context.repository(REPOSITORY_KEY);
@@ -70,7 +70,7 @@ public class CustomJSONRulesDefinitionTest {
     public String customParam = "value";
   }
 
-  public static class MyCustomJavaPropertiesRulesDefinition extends CustomJSONRulesDefinition {
+  public static class MyCustomJSONRulesDefinition extends CustomJSONRulesDefinition {
 
     @Override
     public String repositoryName() {
