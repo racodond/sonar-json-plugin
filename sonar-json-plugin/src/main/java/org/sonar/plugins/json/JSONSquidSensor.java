@@ -71,6 +71,10 @@ public class JSONSquidSensor implements Sensor {
   private IssueSaver issueSaver;
   private RuleKey parsingErrorRuleKey = null;
 
+  public JSONSquidSensor(FileSystem fileSystem, CheckFactory checkFactory) {
+    this(fileSystem, checkFactory, null);
+  }
+
   public JSONSquidSensor(FileSystem fileSystem, CheckFactory checkFactory, @Nullable CustomJSONRulesDefinition[] customRulesDefinition) {
     this.fileSystem = fileSystem;
 
