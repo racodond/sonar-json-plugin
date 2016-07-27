@@ -1,7 +1,7 @@
 SonarQube JSON Plugin
 ====================
 
-[![Build Status](https://api.travis-ci.org/racodond/sonar-json-plugin.svg)](https://travis-ci.org/racodond/sonar-json-plugin)
+[![Build Status](https://api.travis-ci.org/racodond/sonar-json-plugin.svg?branch=master)](https://travis-ci.org/racodond/sonar-json-plugin)
 [![Quality Gate](https://sonarqube.com/api/badges/gate?key=org.codehaus.sonar-plugins.json:json)](https://sonarqube.com/overview?id=org.codehaus.sonar-plugins.json%3Ajson)
 
 Plugin versions and compatibility with SonarQube versions: [http://docs.sonarqube.org/display/PLUG/Plugin+Version+Matrix](http://docs.sonarqube.org/display/PLUG/Plugin+Version+Matrix)
