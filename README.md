@@ -4,8 +4,6 @@ SonarQube JSON Plugin
 [![Build Status](https://api.travis-ci.org/racodond/sonar-json-plugin.svg?branch=master)](https://travis-ci.org/racodond/sonar-json-plugin)
 [![Quality Gate](https://sonarqube.com/api/badges/gate?key=org.codehaus.sonar-plugins.json:json)](https://sonarqube.com/overview?id=org.codehaus.sonar-plugins.json%3Ajson)
 
-Plugin versions and compatibility with SonarQube versions: [http://docs.sonarqube.org/display/PLUG/Plugin+Version+Matrix](http://docs.sonarqube.org/display/PLUG/Plugin+Version+Matrix)
-
 ## Description
 This plugin enables code QA analysis of [JSON files](http://json.org/) within [SonarQube](http://www.sonarqube.org):
 
@@ -18,6 +16,7 @@ This plugin enables code QA analysis of [JSON files](http://json.org/) within [S
 2. Install the JSON plugin either by a [direct download](https://github.com/racodond/sonar-json-plugin/releases) or through the [Update Center](http://docs.sonarqube.org/display/SONAR/Update+Center).
 3. [Install your favorite analyzer](http://docs.sonarqube.org/display/SONAR/Analyzing+Source+Code#AnalyzingSourceCode-RunningAnalysis) (SonarQube Scanner, Maven, Ant, etc.) and analyze your code. Note that starting at version 2.0, Java 8 is required to run an analysis.
 
+Plugin versions and compatibility with SonarQube versions: [http://docs.sonarqube.org/display/PLUG/Plugin+Version+Matrix](http://docs.sonarqube.org/display/PLUG/Plugin+Version+Matrix)
 
 ## Available Checks
 
