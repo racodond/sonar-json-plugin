@@ -37,8 +37,8 @@ public class RuleDescriptionsGenerator {
     .build();
 
   public void generateHtmlRuleDescription(String templatePath, String outputPath) throws IOException {
-    try {
-      Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath), Charsets.UTF_8));
+    try (OutputStream fileOutputStream = new FileOutputStream(outputPath)) {
+      Writer writer = new BufferedWriter(new OutputStreamWriter(fileOutputStream, Charsets.UTF_8));
       writer.write(replaceTags(FileUtils.readFileToString(new File(templatePath), Charsets.UTF_8)));
       writer.flush();
       writer.close();
