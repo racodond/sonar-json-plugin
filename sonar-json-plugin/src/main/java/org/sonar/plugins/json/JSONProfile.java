@@ -39,6 +39,12 @@ public class JSONProfile extends ProfileDefinition {
   @Override
   public RulesProfile createProfile(ValidationMessages messages) {
     AnnotationBasedProfileBuilder annotationBasedProfileBuilder = new AnnotationBasedProfileBuilder(ruleFinder);
-    return annotationBasedProfileBuilder.build(JSONLanguage.KEY, SONARQUBE_WAY_PROFILE_NAME, JSONLanguage.KEY, CheckList.getChecks(), messages);
+    return annotationBasedProfileBuilder.build(
+      CheckList.REPOSITORY_KEY,
+      SONARQUBE_WAY_PROFILE_NAME,
+      JSONLanguage.KEY,
+      CheckList.getChecks(),
+      messages);
   }
+
 }

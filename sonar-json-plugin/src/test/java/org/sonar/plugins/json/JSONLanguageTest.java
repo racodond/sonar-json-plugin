@@ -33,10 +33,9 @@ public class JSONLanguageTest {
   }
 
   @Test
-  public void file_suffix() {
+  public void default_file_suffix() {
     JSONLanguage json = new JSONLanguage();
-    assertThat(json.getFileSuffixes()).hasSize(1);
-    assertThat(json.getFileSuffixes()[0]).isEqualTo("json");
+    assertThat(json.getFileSuffixes()).containsOnly("json");
   }
 
 }

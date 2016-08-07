@@ -26,6 +26,7 @@ import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.rules.Rule;
 import org.sonar.api.rules.RuleFinder;
 import org.sonar.api.utils.ValidationMessages;
+import org.sonar.json.checks.CheckList;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -42,7 +43,7 @@ public class JSONProfileTest {
 
     assertThat(profile.getName()).isEqualTo(JSONProfile.SONARQUBE_WAY_PROFILE_NAME);
     assertThat(profile.getLanguage()).isEqualTo(JSONLanguage.KEY);
-    assertThat(profile.getActiveRulesByRepository(JSONLanguage.KEY)).hasSize(5);
+    assertThat(profile.getActiveRulesByRepository(CheckList.REPOSITORY_KEY)).hasSize(5);
     assertThat(validation.hasErrors()).isFalse();
   }
 

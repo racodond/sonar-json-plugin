@@ -64,7 +64,7 @@ public class JSONSquidSensorTest {
     String relativePath = "sampleUTF8WithBOM.json";
     inputFile(relativePath);
     createJSONSquidSensor().execute(context);
-    assertMeasure("moduleKey:" + relativePath);
+    assertMeasures("moduleKey:" + relativePath);
   }
 
   @Test
@@ -72,10 +72,10 @@ public class JSONSquidSensorTest {
     String relativePath = "sample.json";
     inputFile(relativePath);
     createJSONSquidSensor().execute(context);
-    assertMeasure("moduleKey:" + relativePath);
+    assertMeasures("moduleKey:" + relativePath);
   }
 
-  private void assertMeasure(String key) {
+  private void assertMeasures(String key) {
     assertThat(context.measure(key, CoreMetrics.NCLOC).value()).isEqualTo(6);
     assertThat(context.measure(key, CoreMetrics.STATEMENTS).value()).isEqualTo(7);
     assertThat(context.measure(key, CoreMetrics.CLASSES).value()).isEqualTo(3);
