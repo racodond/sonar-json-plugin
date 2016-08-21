@@ -17,6 +17,7 @@
   <url>https://github.com/racodond/sonar-json-plugin</url>
 
   <properties>
+    <sonar.pluginKey>JSON</sonar.pluginKey>
     <sonar.pluginName>JSON</sonar.pluginName>
     <sonar.pluginClass>org.sonar.plugins.json.JSONPlugin</sonar.pluginClass>
     <sonar.skipDependenciesPackaging>true</sonar.skipDependenciesPackaging>
