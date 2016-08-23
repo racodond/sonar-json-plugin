@@ -53,6 +53,7 @@ public class BOMCheck extends DoubleDispatchVisitorCheck implements CharsetAware
     if (charset.equals(Charsets.UTF_8) && tree.hasByteOrderMark()) {
       addFileIssue("Remove the BOM.");
     }
+    super.visitJson(tree);
   }
 
 }
