@@ -1,0 +1,8 @@
+{
+  "mykey": {},
+  "abc" : [123, 234],
+  "blabla_mykey_blabla" : 123,
+
+  "zzz": { "ddd": "jjj", "mykey": "\"jjj", "ee": [244, 333]}
+}
+
