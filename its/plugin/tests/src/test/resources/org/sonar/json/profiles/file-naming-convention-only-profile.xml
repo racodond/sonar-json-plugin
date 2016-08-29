@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<profile>
+  <name>file-naming-convention-only-profile</name>
+  <language>json</language>
+  <rules>
+    <rule>
+      <repositoryKey>json</repositoryKey>
+      <key>S1578</key>
+      <priority>MINOR</priority>
+      <parameters/>
+    </rule>
+  </rules>
+</profile>
