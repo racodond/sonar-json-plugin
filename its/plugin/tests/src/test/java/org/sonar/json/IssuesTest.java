@@ -66,7 +66,7 @@ public class IssuesTest {
 
     assertThat(issues.get(1).ruleKey()).isEqualTo("json:S1578");
     assertThat(issues.get(1).severity()).isEqualTo("MINOR");
-    assertThat(issues.get(0).line()).isNull();
+    assertThat(issues.get(1).line()).isNull();
   }
 
 }
