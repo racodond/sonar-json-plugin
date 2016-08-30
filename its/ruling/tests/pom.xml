@@ -39,7 +39,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <includes>
-              <include>org/sonar/json/its/JsonTest.java</include>
+              <include>org/sonar/json/its/JsonRulingTest.java</include>
             </includes>
           </configuration>
         </plugin>

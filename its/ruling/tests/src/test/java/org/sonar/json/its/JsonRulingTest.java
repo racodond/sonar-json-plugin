@@ -33,7 +33,7 @@ import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-public class JsonTest {
+public class JsonRulingTest {
 
   @ClassRule
   public static Orchestrator orchestrator = Orchestrator.builderEnv()
