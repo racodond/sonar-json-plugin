@@ -1,0 +1,9 @@
+{
+'project:custom/puppet/dependencies/duplicated-dependencies/metadata.json':[
+22,
+23,
+],
+'project:custom/puppet/dependencies/invalid-dependencies/metadata.json':[
+21,
+],
+}
