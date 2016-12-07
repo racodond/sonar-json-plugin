@@ -9,8 +9,13 @@ SonarQube JSON Plugin
 This plugin enables code QA analysis of [JSON files](http://json.org/) within [SonarQube](http://www.sonarqube.org):
 
  * Computes metrics: lines of code, statements, etc.
- * Performs more than [12 checks](#available-checks)
+ * Performs more than [12 checks](http://sonarqube.racodond.com/coding_rules#languages=json)
  * Provide the ability to write your own checks
+
+
+## Demo
+
+ * [Demo project](http://sonarqube.racodond.com/dashboard/index?id=json-sample-project)
 
 ## Usage
 1. [Download ad install](http://docs.sonarqube.org/display/SONAR/Setup+and+Upgrade) SonarQube
