@@ -47,7 +47,7 @@ public class SeparatedListTest {
 
     assertThat(separatedList).contains("a");
     assertThat(separatedList).containsOnly("a", "b", "c");
-    assertThat(separatedList.containsAll(ImmutableList.of("a", "b", "c")));
+    assertThat(separatedList.containsAll(ImmutableList.of("a", "b", "c"))).isTrue();
 
     assertThat(separatedList.getSeparators()).hasSize(2);
     assertThat(separatedList.getSeparators().get(0).text()).isEqualTo(",");

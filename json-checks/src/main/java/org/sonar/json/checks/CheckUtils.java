@@ -20,6 +20,7 @@
 package org.sonar.json.checks;
 
 import org.sonar.check.Rule;
+import org.sonar.plugins.json.api.JSONCheck;
 
 public class CheckUtils {
 
@@ -28,9 +29,9 @@ public class CheckUtils {
   private CheckUtils() {
   }
 
-  public static String paramsErrorMessage(Class clazz, String message) {
-    return "Check json:" + ((Rule) clazz.getAnnotation(Rule.class)).key()
-      + " (" + ((Rule) clazz.getAnnotation(Rule.class)).name() + "): "
+  public static String paramsErrorMessage(Class<? extends JSONCheck> clazz, String message) {
+    return "Check json:" + clazz.getAnnotation(Rule.class).key()
+      + " (" + clazz.getAnnotation(Rule.class).name() + "): "
       + message;
   }
 
