@@ -10,7 +10,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>json-checks-testkit</artifactId>
-  <name>SonarQube JSON Plugin :: Check Test Toolkit</name>
+  <name>SonarQube JSON Analyzer :: Check Test Toolkit</name>
 
   <dependencies>
     <dependency>

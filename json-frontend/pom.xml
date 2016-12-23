@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>json-frontend</artifactId>
-  <name>SonarQube JSON Plugin :: Frontend</name>
+  <name>SonarQube JSON Analyzer :: Frontend</name>
 
   <dependencies>
     <dependency>

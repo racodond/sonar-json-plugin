@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>json-checks</artifactId>
-  <name>SonarQube JSON Plugin :: Checks</name>
+  <name>SonarQube JSON Analyzer :: Checks</name>
 
   <dependencies>
     <dependency>

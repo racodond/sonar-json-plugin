@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>json-its-plugin-plugins</artifactId>
-  <name>SonarQube JSON Plugin :: Integration Tests :: Plugin :: Plugins</name>
+  <name>SonarQube JSON Analyzer :: Integration Tests :: Plugin :: Plugins</name>
   <packaging>pom</packaging>
 
   <modules>

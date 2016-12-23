@@ -12,7 +12,7 @@
   <artifactId>sonar-json-plugin</artifactId>
   <packaging>sonar-plugin</packaging>
 
-  <name>SonarQube JSON Plugin :: SonarQube Plugin</name>
+  <name>SonarQube JSON Analyzer :: SonarQube Plugin</name>
   <description>Enables analysis of JSON files.</description>
   <url>https://github.com/racodond/sonar-json-plugin</url>
 

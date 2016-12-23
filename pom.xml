@@ -14,7 +14,7 @@
   <version>2.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>SonarQube JSON Plugin</name>
+  <name>SonarQube JSON Analyzer</name>
   <description>Enables analysis of JSON files in SonarQube</description>
   <url>https://github.com/racodond/sonar-json-plugin</url>
   <inceptionYear>2015</inceptionYear>
@@ -58,7 +58,7 @@
   </issueManagement>
 
   <properties>
-    <license.title>SonarQube JSON Plugin</license.title>
+    <license.title>SonarQube JSON Analyzer</license.title>
     <license.owner>David RACODON</license.owner>
     <license.mailto>david.racodon@gmail.com</license.mailto>
     <sonar.version>5.6</sonar.version>
