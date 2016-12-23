@@ -19,15 +19,16 @@
  */
 package org.sonar.json.parser;
 
-import com.google.common.base.Charsets;
-import com.sonar.sslr.api.RecognitionException;
 import org.junit.Test;
 import org.sonar.plugins.json.api.tree.KeyTree;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
-public class KeyTreeTest {
+public class KeyTreeTest extends CommonJsonTreeTest {
+
+  public KeyTreeTest() {
+    super(JSONLexicalGrammar.KEY);
+  }
 
   @Test
   public void key() {
@@ -64,28 +65,16 @@ public class KeyTreeTest {
     checkNotParsed("\"\\u13F\"");
   }
 
-  private KeyTree parse(String toParse) {
-    return (KeyTree) JSONParserBuilder
-      .createTestParser(Charsets.UTF_8, JSONLexicalGrammar.KEY)
-      .parse(toParse);
+  private void checkParsed(String toParse, String expected) {
+    KeyTree tree = (KeyTree) parser().parse(toParse);
+    assertThat(tree).isNotNull();
+    assertThat(tree.value()).isNotNull();
+    assertThat(tree.actualText()).isNotNull();
+    assertThat(tree.actualText()).isEqualTo(expected.substring(1, expected.length() - 1));
   }
 
   private void checkParsed(String toParse) {
     checkParsed(toParse, toParse);
-  }
-
-  private void checkParsed(String toParse, String expected) {
-    KeyTree tree = parse(toParse);
-    assertThat(tree.actualText()).isEqualTo(expected.substring(1, expected.length() - 1));
-  }
-
-  private void checkNotParsed(String toParse) {
-    try {
-      parse(toParse);
-    } catch (RecognitionException e) {
-      return;
-    }
-    fail("Did not throw a RecognitionException as expected.");
   }
 
 }

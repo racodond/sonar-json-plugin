@@ -17,48 +17,45 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.json.tree.impl;
+package org.sonar.json.parser;
 
-import com.google.common.collect.Iterators;
-
-import java.util.Iterator;
-
-import org.sonar.plugins.json.api.tree.KeyTree;
-import org.sonar.plugins.json.api.tree.SyntaxToken;
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+import com.sonar.sslr.api.typed.ActionParser;
 import org.sonar.plugins.json.api.tree.Tree;
-import org.sonar.plugins.json.api.visitors.DoubleDispatchVisitor;
 
-public class KeyTreeImpl extends JSONTree implements KeyTree {
+import java.io.File;
 
-  private final SyntaxToken key;
+import static org.junit.Assert.fail;
 
-  public KeyTreeImpl(SyntaxToken key) {
-    this.key = key;
+public abstract class CommonJsonTreeTest {
+
+  private final ActionParser<Tree> parser;
+
+  public CommonJsonTreeTest(JSONLexicalGrammar ruleKey) {
+    parser = JSONParserBuilder.createTestParser(Charsets.UTF_8, ruleKey);
   }
 
-  @Override
-  public Tree.Kind getKind() {
-    return Tree.Kind.KEY;
+  public ActionParser<Tree> parser() {
+    return parser;
   }
 
-  @Override
-  public Iterator<Tree> childrenIterator() {
-    return Iterators.singletonIterator(key);
+  public void checkNotParsed(String toParse) {
+    try {
+      parser.parse(toParse);
+    } catch (Exception e) {
+      return;
+    }
+    fail("Did not throw a RecognitionException as expected.");
   }
 
-  @Override
-  public String actualText() {
-    return key.text().substring(1, key.text().length() - 1);
-  }
-
-  @Override
-  public SyntaxToken value() {
-    return key;
-  }
-
-  @Override
-  public void accept(DoubleDispatchVisitor visitor) {
-    visitor.visitKey(this);
+  public void checkNotParsed(File file) {
+    try {
+      parser.parse(Files.toString(file, Charsets.UTF_8));
+    } catch (Exception e) {
+      return;
+    }
+    fail("Did not throw a RecognitionException as expected.");
   }
 
 }

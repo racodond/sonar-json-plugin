@@ -22,13 +22,15 @@ package org.sonar.json.parser;
 import com.google.common.base.Charsets;
 import org.junit.Test;
 import org.sonar.plugins.json.api.tree.SyntaxToken;
-import org.sonar.plugins.json.api.tree.Tree;
 
-import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class NumberTreeTest {
+public class NumberTreeTest extends CommonSyntaxTokenTreeTest {
+
+  public NumberTreeTest() {
+    super(JSONLexicalGrammar.NUMBER);
+  }
 
   @Test
   public void number() {
@@ -80,24 +82,10 @@ public class NumberTreeTest {
     checkNotParsed("1.");
   }
 
-  private Tree parse(String toParse) {
-    return JSONParserBuilder
-      .createTestParser(Charsets.UTF_8, JSONLexicalGrammar.NUMBER)
-      .parse(toParse);
-  }
-
-  private void checkParsed(String toParse) {
-    checkParsed(toParse, toParse);
-  }
-
-  private void checkParsed(String toParse, String expected) {
-    SyntaxToken tree = (SyntaxToken) parse(toParse);
-    assertThat(tree.text()).isEqualTo(expected);
-  }
-
-  private void checkNotParsed(String toParse) {
+  @Override
+  public void checkNotParsed(String toParse) {
     try {
-      SyntaxToken tree = (SyntaxToken) parse(toParse);
+      SyntaxToken tree = (SyntaxToken) JSONParserBuilder.createTestParser(Charsets.UTF_8, JSONLexicalGrammar.NUMBER);
       if (!tree.text().equals(toParse)) {
         assertTrue(true);
         return;

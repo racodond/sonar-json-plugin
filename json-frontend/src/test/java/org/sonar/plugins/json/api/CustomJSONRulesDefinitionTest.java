@@ -74,7 +74,6 @@ public class CustomJSONRulesDefinitionTest {
 
     @Override
     public String repositoryName() {
-      System.out.println(REPOSITORY_NAME);
       return REPOSITORY_NAME;
     }
 
@@ -85,7 +84,7 @@ public class CustomJSONRulesDefinitionTest {
 
     @Override
     public Class[] checkClasses() {
-      return new Class[] {MyCustomRule.class};
+      return new Class[]{MyCustomRule.class};
     }
   }
 

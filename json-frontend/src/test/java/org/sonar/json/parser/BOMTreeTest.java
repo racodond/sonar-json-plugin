@@ -19,15 +19,13 @@
  */
 package org.sonar.json.parser;
 
-import com.google.common.base.Charsets;
-import com.sonar.sslr.api.RecognitionException;
 import org.junit.Test;
-import org.sonar.plugins.json.api.tree.SyntaxToken;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.fail;
+public class BOMTreeTest extends CommonSyntaxTokenTreeTest {
 
-public class BOMTreeTest {
+  public BOMTreeTest() {
+    super(JSONLexicalGrammar.BOM);
+  }
 
   @Test
   public void bom() {
@@ -37,30 +35,6 @@ public class BOMTreeTest {
   @Test
   public void notBom() {
     checkNotParsed("\"\\ufeff\"");
-  }
-
-  private SyntaxToken parse(String toParse) {
-    return (SyntaxToken) JSONParserBuilder
-      .createTestParser(Charsets.UTF_8, JSONLexicalGrammar.BOM)
-      .parse(toParse);
-  }
-
-  private void checkParsed(String toParse) {
-    checkParsed(toParse, toParse);
-  }
-
-  private void checkParsed(String toParse, String expected) {
-    SyntaxToken tree = parse(toParse);
-    assertThat(tree.text()).isEqualTo(expected);
-  }
-
-  private void checkNotParsed(String toParse) {
-    try {
-      parse(toParse);
-    } catch (RecognitionException e) {
-      return;
-    }
-    fail("Did not throw a RecognitionException as expected.");
   }
 
 }

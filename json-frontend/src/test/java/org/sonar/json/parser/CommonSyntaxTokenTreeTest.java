@@ -17,36 +17,35 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.json.tree.impl;
-
-import javax.annotation.Nullable;
+package org.sonar.json.parser;
 
 import org.sonar.plugins.json.api.tree.SyntaxToken;
 
-public class SyntaxList<T> {
+import static org.fest.assertions.Assertions.assertThat;
 
-  private final T element;
-  private final SyntaxToken commaToken;
-  private final SyntaxList<T> next;
+public abstract class CommonSyntaxTokenTreeTest extends CommonJsonTreeTest {
 
-  public SyntaxList(T element, @Nullable SyntaxToken commaToken, @Nullable SyntaxList<T> next) {
-    this.element = element;
-    this.commaToken = commaToken;
-    this.next = next;
+  private String expectedText;
+
+  public CommonSyntaxTokenTreeTest(JSONLexicalGrammar ruleKey) {
+    super(ruleKey);
+    this.expectedText = null;
   }
 
-  public T element() {
-    return element;
+  public CommonSyntaxTokenTreeTest(JSONLexicalGrammar ruleKey, String expectedText) {
+    super(ruleKey);
+    this.expectedText = expectedText;
   }
 
-  @Nullable
-  public SyntaxToken commaToken() {
-    return commaToken;
+  public void checkParsed(String toParse, String expected) {
+    SyntaxToken token = (SyntaxToken) parser().parse(toParse);
+    assertThat(token.text()).isEqualTo(expected);
   }
 
-  @Nullable
-  public SyntaxList next() {
-    return next;
+  public void checkParsed(String toParse) {
+    checkParsed(
+      toParse,
+      expectedText != null ? expectedText : toParse);
   }
 
 }

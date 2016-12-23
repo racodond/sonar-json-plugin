@@ -19,15 +19,13 @@
  */
 package org.sonar.json.parser;
 
-import com.google.common.base.Charsets;
-import com.sonar.sslr.api.RecognitionException;
 import org.junit.Test;
-import org.sonar.plugins.json.api.tree.SyntaxToken;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.fail;
+public class LeftBraceTreeTest extends CommonSyntaxTokenTreeTest {
 
-public class LeftBraceTreeTest {
+  public LeftBraceTreeTest() {
+    super(JSONLexicalGrammar.LEFT_BRACE, "{");
+  }
 
   @Test
   public void leftBrace() {
@@ -40,26 +38,6 @@ public class LeftBraceTreeTest {
   public void notLeftBrace() {
     checkNotParsed("[");
     checkNotParsed("}");
-  }
-
-  private SyntaxToken parse(String toParse) {
-    return (SyntaxToken) JSONParserBuilder
-      .createTestParser(Charsets.UTF_8, JSONLexicalGrammar.LEFT_BRACE)
-      .parse(toParse);
-  }
-
-  private void checkParsed(String toParse) {
-    SyntaxToken tree = parse(toParse);
-    assertThat(tree.text()).isEqualTo("{");
-  }
-
-  private void checkNotParsed(String toParse) {
-    try {
-      parse(toParse);
-    } catch (RecognitionException e) {
-      return;
-    }
-    fail("Did not throw a RecognitionException as expected.");
   }
 
 }

@@ -19,50 +19,24 @@
  */
 package org.sonar.json.parser;
 
-import com.google.common.base.Charsets;
-import com.sonar.sslr.api.RecognitionException;
 import org.junit.Test;
-import org.sonar.plugins.json.api.tree.SyntaxToken;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.fail;
+public class ColonTreeTest extends CommonSyntaxTokenTreeTest {
 
-public class ColonTreeTest {
+  public ColonTreeTest() {
+    super(JSONLexicalGrammar.COLON, ":");
+  }
 
   @Test
   public void colon() {
     checkParsed(":");
-    checkParsed(" :", ":");
-    checkParsed("  :", ":");
+    checkParsed(" :");
+    checkParsed("  :");
   }
 
   @Test
   public void notColon() {
     checkNotParsed("=");
-  }
-
-  private SyntaxToken parse(String toParse) {
-    return (SyntaxToken) JSONParserBuilder
-      .createTestParser(Charsets.UTF_8, JSONLexicalGrammar.COLON)
-      .parse(toParse);
-  }
-
-  private void checkParsed(String toParse) {
-    checkParsed(toParse, toParse);
-  }
-
-  private void checkParsed(String toParse, String expected) {
-    SyntaxToken tree = parse(toParse);
-    assertThat(tree.text()).isEqualTo(expected);
-  }
-
-  private void checkNotParsed(String toParse) {
-    try {
-      parse(toParse);
-    } catch (RecognitionException e) {
-      return;
-    }
-    fail("Did not throw a RecognitionException as expected.");
   }
 
 }
