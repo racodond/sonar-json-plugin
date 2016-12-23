@@ -21,7 +21,7 @@ package org.sonar.json.parser;
 
 import com.sonar.sslr.api.typed.GrammarBuilder;
 import org.sonar.json.tree.impl.InternalSyntaxToken;
-import org.sonar.json.tree.impl.SyntaxList;
+import org.sonar.json.tree.impl.SeparatedList;
 import org.sonar.plugins.json.api.tree.*;
 
 public class JSONGrammar {
@@ -58,18 +58,18 @@ public class JSONGrammar {
         b.token(JSONLexicalGrammar.RIGHT_BRACKET)));
   }
 
-  public SyntaxList<ValueTree> VALUE_LIST() {
-    return b.<SyntaxList<ValueTree>>nonterminal().is(
-      b.firstOf(
-        f.valueList(VALUE(), b.token(JSONLexicalGrammar.COMMA), VALUE_LIST()),
-        f.valueList(VALUE())));
+  public SeparatedList<ValueTree> VALUE_LIST() {
+    return b.<SeparatedList<ValueTree>>nonterminal().is(
+      f.valueList(
+        VALUE(),
+        b.zeroOrMore(f.newTuple1(b.token(JSONLexicalGrammar.COMMA), VALUE()))));
   }
 
-  public SyntaxList<PairTree> PAIR_LIST() {
-    return b.<SyntaxList<PairTree>>nonterminal().is(
-      b.firstOf(
-        f.pairList(PAIR(), b.token(JSONLexicalGrammar.COMMA), PAIR_LIST()),
-        f.pairList(PAIR())));
+  public SeparatedList<PairTree> PAIR_LIST() {
+    return b.<SeparatedList<PairTree>>nonterminal().is(
+      f.pairList(
+        PAIR(),
+        b.zeroOrMore(f.newTuple2(b.token(JSONLexicalGrammar.COMMA), PAIR()))));
   }
 
   public PairTree PAIR() {
@@ -120,7 +120,7 @@ public class JSONGrammar {
 
   public LiteralTree NULL() {
     return b.<LiteralTree>nonterminal().is(
-      f.nulle(b.token(JSONLexicalGrammar.NULL)));
+      f.nul(b.token(JSONLexicalGrammar.NULL)));
   }
 
 }

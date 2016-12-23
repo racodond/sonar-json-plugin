@@ -19,64 +19,54 @@
  */
 package org.sonar.json.parser;
 
-import com.google.common.base.Charsets;
 import org.junit.Test;
 import org.sonar.plugins.json.api.tree.*;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-public class PairTreeTest {
+public class PairTreeTest extends CommonJsonTreeTest {
+
+  public PairTreeTest() {
+    super(JSONLexicalGrammar.PAIR);
+  }
 
   @Test
   public void pair() {
     PairTree tree;
 
-    tree = parse("\"key\":\"value\"");
-    assertThat(tree.key()).isNotNull();
-    assertThat(tree.colon()).isNotNull();
-    assertThat(tree.value()).isNotNull();
+    tree = checkParsed("\"key\":\"value\"");
     assertThat(tree.key().actualText()).isEqualTo("key");
     assertTrue(tree.value().value().is(Tree.Kind.STRING));
     assertThat(((StringTree) tree.value().value()).text()).isEqualTo("\"value\"");
     assertThat(((StringTree) tree.value().value()).actualText()).isEqualTo("value");
 
-    tree = parse(" \"key\" : \"value\"");
-    assertThat(tree.key()).isNotNull();
-    assertThat(tree.colon()).isNotNull();
-    assertThat(tree.value()).isNotNull();
+    tree = checkParsed(" \"key\" : \"value\"");
     assertThat(tree.key().actualText()).isEqualTo("key");
     assertTrue(tree.value().value().is(Tree.Kind.STRING));
     assertThat(((StringTree) tree.value().value()).text()).isEqualTo("\"value\"");
     assertThat(((StringTree) tree.value().value()).actualText()).isEqualTo("value");
 
-    tree = parse("\"key\" : {\"abc\": 1, \"def\": 2}");
-    assertThat(tree.key()).isNotNull();
-    assertThat(tree.colon()).isNotNull();
-    assertThat(tree.value()).isNotNull();
+    tree = checkParsed("\"key\" : {\"abc\": 1, \"def\": 2}");
     assertThat(tree.key().actualText()).isEqualTo("key");
     assertTrue(tree.value().value().is(Tree.Kind.OBJECT));
     assertThat(((ObjectTree) tree.value().value()).pairs().size()).isEqualTo(2);
 
-    tree = parse("\"key\" : [\"abc\", \"def\"]");
-    assertThat(tree.key()).isNotNull();
-    assertThat(tree.colon()).isNotNull();
-    assertThat(tree.value()).isNotNull();
+    tree = checkParsed("\"key\" : [\"abc\", \"def\"]");
     assertThat(tree.key().actualText()).isEqualTo("key");
     assertTrue(tree.value().value().is(Tree.Kind.ARRAY));
     assertThat(((ArrayTree) tree.value().value()).elements().size()).isEqualTo(2);
 
-    tree = parse("\"key\" : null");
+    tree = checkParsed("\"key\" : null");
     assertTrue(tree.value().value().is(Tree.Kind.NULL));
 
-    tree = parse("\"key\" : false");
+    tree = checkParsed("\"key\" : false");
     assertTrue(tree.value().value().is(Tree.Kind.FALSE));
 
-    tree = parse("\"key\" : true");
+    tree = checkParsed("\"key\" : true");
     assertTrue(tree.value().value().is(Tree.Kind.TRUE));
 
-    tree = parse("\"key\" : 1");
+    tree = checkParsed("\"key\" : 1");
     assertTrue(tree.value().value().is(Tree.Kind.NUMBER));
   }
 
@@ -89,19 +79,13 @@ public class PairTreeTest {
     checkNotParsed(": \"ab\"");
   }
 
-  private PairTree parse(String toParse) {
-    return (PairTree) JSONParserBuilder
-      .createTestParser(Charsets.UTF_8, JSONLexicalGrammar.PAIR)
-      .parse(toParse);
-  }
-
-  private void checkNotParsed(String toParse) {
-    try {
-      parse(toParse);
-    } catch (Exception e) {
-      return;
-    }
-    fail("Did not throw a RecognitionException as expected.");
+  private PairTree checkParsed(String toParse) {
+    PairTree tree = (PairTree) parser().parse(toParse);
+    assertThat(tree).isNotNull();
+    assertThat(tree.key()).isNotNull();
+    assertThat(tree.colon()).isNotNull();
+    assertThat(tree.value()).isNotNull();
+    return tree;
   }
 
 }

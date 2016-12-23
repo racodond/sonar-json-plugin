@@ -42,7 +42,7 @@ public class ValueTreeImpl extends JSONTree implements ValueTree {
 
   @Override
   public Iterator<Tree> childrenIterator() {
-    return Iterators.forArray(value);
+    return Iterators.singletonIterator(value);
   }
 
   @Override

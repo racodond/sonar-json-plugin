@@ -19,76 +19,39 @@
  */
 package org.sonar.json.parser;
 
-import com.google.common.base.Charsets;
 import org.junit.Test;
 import org.sonar.plugins.json.api.tree.Tree;
 import org.sonar.plugins.json.api.tree.ValueTree;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.fest.assertions.Assertions.assertThat;
 
-public class ValueTreeTest {
+public class ValueTreeTest extends CommonJsonTreeTest {
+
+  public ValueTreeTest() {
+    super(JSONLexicalGrammar.VALUE);
+  }
 
   @Test
   public void value() {
-    ValueTree tree;
-
-    tree = parse("[]");
-    assertTrue(tree.value().is(Tree.Kind.ARRAY));
-
-    tree = parse(" []");
-    assertTrue(tree.value().is(Tree.Kind.ARRAY));
-
-    tree = parse(" [ ]");
-    assertTrue(tree.value().is(Tree.Kind.ARRAY));
-
-    tree = parse("{}");
-    assertTrue(tree.value().is(Tree.Kind.OBJECT));
-
-    tree = parse(" {}");
-    assertTrue(tree.value().is(Tree.Kind.OBJECT));
-
-    tree = parse(" { }");
-    assertTrue(tree.value().is(Tree.Kind.OBJECT));
-
-    tree = parse("null");
-    assertTrue(tree.value().is(Tree.Kind.NULL));
-
-    tree = parse(" null");
-    assertTrue(tree.value().is(Tree.Kind.NULL));
-
-    tree = parse("true");
-    assertTrue(tree.value().is(Tree.Kind.TRUE));
-
-    tree = parse(" true");
-    assertTrue(tree.value().is(Tree.Kind.TRUE));
-
-    tree = parse("false");
-    assertTrue(tree.value().is(Tree.Kind.FALSE));
-
-    tree = parse("\"abc\"");
-    assertTrue(tree.value().is(Tree.Kind.STRING));
-
-    tree = parse(" \"abc\"");
-    assertTrue(tree.value().is(Tree.Kind.STRING));
-
-    tree = parse("1");
-    assertTrue(tree.value().is(Tree.Kind.NUMBER));
-
-    tree = parse("1.5");
-    assertTrue(tree.value().is(Tree.Kind.NUMBER));
-
-    tree = parse(" 1");
-    assertTrue(tree.value().is(Tree.Kind.NUMBER));
-
-    tree = parse(" 1.5");
-    assertTrue(tree.value().is(Tree.Kind.NUMBER));
-
-    tree = parse("-1.5");
-    assertTrue(tree.value().is(Tree.Kind.NUMBER));
-
-    tree = parse(" -1.5");
-    assertTrue(tree.value().is(Tree.Kind.NUMBER));
+    checkParsed("[]", Tree.Kind.ARRAY);
+    checkParsed(" []", Tree.Kind.ARRAY);
+    checkParsed(" [ ]", Tree.Kind.ARRAY);
+    checkParsed("{}", Tree.Kind.OBJECT);
+    checkParsed(" {}", Tree.Kind.OBJECT);
+    checkParsed(" { }", Tree.Kind.OBJECT);
+    checkParsed("null", Tree.Kind.NULL);
+    checkParsed(" null", Tree.Kind.NULL);
+    checkParsed("true", Tree.Kind.TRUE);
+    checkParsed(" true", Tree.Kind.TRUE);
+    checkParsed("false", Tree.Kind.FALSE);
+    checkParsed("\"abc\"", Tree.Kind.STRING);
+    checkParsed(" \"abc\"", Tree.Kind.STRING);
+    checkParsed("1", Tree.Kind.NUMBER);
+    checkParsed("1.5", Tree.Kind.NUMBER);
+    checkParsed(" 1", Tree.Kind.NUMBER);
+    checkParsed(" 1.5", Tree.Kind.NUMBER);
+    checkParsed("-1.5", Tree.Kind.NUMBER);
+    checkParsed(" -1.5", Tree.Kind.NUMBER);
   }
 
   @Test
@@ -96,19 +59,11 @@ public class ValueTreeTest {
     checkNotParsed("abc");
   }
 
-  private ValueTree parse(String toParse) {
-    return (ValueTree) JSONParserBuilder
-      .createTestParser(Charsets.UTF_8, JSONLexicalGrammar.VALUE)
-      .parse(toParse);
-  }
-
-  private void checkNotParsed(String toParse) {
-    try {
-      parse(toParse);
-    } catch (Exception e) {
-      return;
-    }
-    fail("Did not throw a RecognitionException as expected.");
+  private void checkParsed(String toParse, Tree.Kind kind) {
+    ValueTree tree = (ValueTree) parser().parse(toParse);
+    assertThat(tree).isNotNull();
+    assertThat(tree.value()).isNotNull();
+    assertThat(tree.value().is(kind)).isTrue();
   }
 
 }

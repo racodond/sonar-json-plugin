@@ -19,9 +19,12 @@
  */
 package org.sonar.json.parser;
 
+import com.google.common.collect.Lists;
 import com.sonar.sslr.api.typed.Optional;
 import org.sonar.json.tree.impl.*;
 import org.sonar.plugins.json.api.tree.*;
+
+import java.util.List;
 
 public class TreeFactory {
 
@@ -29,12 +32,12 @@ public class TreeFactory {
     return new JsonTreeImpl(byteOrderMark.orNull(), value.orNull(), eof);
   }
 
-  public ObjectTree object(InternalSyntaxToken leftBrace, Optional<SyntaxList<PairTree>> pairSyntaxList, InternalSyntaxToken rightBrace) {
-    return new ObjectTreeImpl(leftBrace, pairSyntaxList.orNull(), rightBrace);
+  public ObjectTree object(InternalSyntaxToken leftBrace, Optional<SeparatedList<PairTree>> pairs, InternalSyntaxToken rightBrace) {
+    return new ObjectTreeImpl(leftBrace, pairs.orNull(), rightBrace);
   }
 
-  public ArrayTree array(InternalSyntaxToken leftBracket, Optional<SyntaxList<ValueTree>> elementSyntaxList, InternalSyntaxToken rightBracket) {
-    return new ArrayTreeImpl(leftBracket, elementSyntaxList.orNull(), rightBracket);
+  public ArrayTree array(InternalSyntaxToken leftBracket, Optional<SeparatedList<ValueTree>> values, InternalSyntaxToken rightBracket) {
+    return new ArrayTreeImpl(leftBracket, values.orNull(), rightBracket);
   }
 
   public PairTree pair(KeyTree key, SyntaxToken colon, ValueTree value) {
@@ -49,20 +52,36 @@ public class TreeFactory {
     return new ValueTreeImpl(value);
   }
 
-  public SyntaxList<ValueTree> valueList(ValueTree value) {
-    return new SyntaxList<>(value, null, null);
+  public SeparatedList<ValueTree> valueList(ValueTree value, Optional<List<Tuple<InternalSyntaxToken, ValueTree>>> subsequentValues) {
+    List<ValueTree> values = Lists.newArrayList();
+    List<InternalSyntaxToken> commas = Lists.newArrayList();
+
+    values.add(value);
+
+    if (subsequentValues.isPresent()) {
+      for (Tuple<InternalSyntaxToken, ValueTree> t : subsequentValues.get()) {
+        commas.add(t.first());
+        values.add(t.second());
+      }
+    }
+
+    return new SeparatedList<>(values, commas);
   }
 
-  public SyntaxList<ValueTree> valueList(ValueTree value, InternalSyntaxToken commaToken, SyntaxList<ValueTree> next) {
-    return new SyntaxList<>(value, commaToken, next);
-  }
+  public SeparatedList<PairTree> pairList(PairTree pair, Optional<List<Tuple<InternalSyntaxToken, PairTree>>> subsequentPairs) {
+    List<PairTree> pairs = Lists.newArrayList();
+    List<InternalSyntaxToken> commas = Lists.newArrayList();
 
-  public SyntaxList<PairTree> pairList(PairTree pair) {
-    return new SyntaxList<>(pair, null, null);
-  }
+    pairs.add(pair);
 
-  public SyntaxList<PairTree> pairList(PairTree pair, InternalSyntaxToken commaToken, SyntaxList<PairTree> next) {
-    return new SyntaxList<>(pair, commaToken, next);
+    if (subsequentPairs.isPresent()) {
+      for (Tuple<InternalSyntaxToken, PairTree> t : subsequentPairs.get()) {
+        commas.add(t.first());
+        pairs.add(t.second());
+      }
+    }
+
+    return new SeparatedList<>(pairs, commas);
   }
 
   public StringTree string(SyntaxToken token) {
@@ -81,8 +100,41 @@ public class TreeFactory {
     return new TrueTreeImpl(token);
   }
 
-  public LiteralTree nulle(SyntaxToken token) {
+  public LiteralTree nul(SyntaxToken token) {
     return new NullTreeImpl(token);
+  }
+
+  public static class Tuple<T, U> {
+
+    private final T first;
+    private final U second;
+
+    public Tuple(T first, U second) {
+      super();
+
+      this.first = first;
+      this.second = second;
+    }
+
+    public T first() {
+      return first;
+    }
+
+    public U second() {
+      return second;
+    }
+  }
+
+  private static <T, U> Tuple<T, U> newTuple(T first, U second) {
+    return new Tuple<>(first, second);
+  }
+
+  public <T, U> Tuple<T, U> newTuple1(T first, U second) {
+    return newTuple(first, second);
+  }
+
+  public <T, U> Tuple<T, U> newTuple2(T first, U second) {
+    return newTuple(first, second);
   }
 
 }

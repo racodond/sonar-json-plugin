@@ -19,32 +19,29 @@
  */
 package org.sonar.json.tree.impl;
 
+import com.google.common.base.Functions;
 import com.google.common.collect.Iterators;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import javax.annotation.Nullable;
-
 import org.sonar.plugins.json.api.tree.ArrayTree;
 import org.sonar.plugins.json.api.tree.SyntaxToken;
 import org.sonar.plugins.json.api.tree.Tree;
 import org.sonar.plugins.json.api.tree.ValueTree;
 import org.sonar.plugins.json.api.visitors.DoubleDispatchVisitor;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 public class ArrayTreeImpl extends JSONTree implements ArrayTree {
 
   private final SyntaxToken leftBracket;
-  private final SyntaxList<ValueTree> elementSyntaxList;
-  private final List<ValueTree> elements;
-  private final List<Tree> allTrees;
+  private final SeparatedList<ValueTree> values;
   private final SyntaxToken rightBracket;
 
-  public ArrayTreeImpl(SyntaxToken leftBracket, @Nullable SyntaxList<ValueTree> elementSyntaxList, SyntaxToken rightBracket) {
+  public ArrayTreeImpl(SyntaxToken leftBracket, @Nullable SeparatedList<ValueTree> values, SyntaxToken rightBracket) {
     this.leftBracket = leftBracket;
-    this.elementSyntaxList = elementSyntaxList;
-    this.elements = buildElementList();
-    this.allTrees = buildAllTreeList();
+    this.values = values;
     this.rightBracket = rightBracket;
   }
 
@@ -57,7 +54,7 @@ public class ArrayTreeImpl extends JSONTree implements ArrayTree {
   public Iterator<Tree> childrenIterator() {
     return Iterators.concat(
       Iterators.singletonIterator(leftBracket),
-      allTrees.iterator(),
+      values != null ? values.elementsAndSeparators(Functions.identity()) : new ArrayList<Tree>().iterator(),
       Iterators.singletonIterator(rightBracket));
   }
 
@@ -78,45 +75,7 @@ public class ArrayTreeImpl extends JSONTree implements ArrayTree {
 
   @Override
   public List<ValueTree> elements() {
-    return elements;
-  }
-
-  private List<ValueTree> buildElementList() {
-    List<ValueTree> elementList = new ArrayList<>();
-
-    if (elementSyntaxList != null) {
-      elementList.add(elementSyntaxList.element());
-
-      SyntaxList<ValueTree> nextSyntaxList = elementSyntaxList.next();
-      while (nextSyntaxList != null) {
-        elementList.add(nextSyntaxList.element());
-        nextSyntaxList = nextSyntaxList.next();
-      }
-    }
-
-    return elementList;
-  }
-
-  private List<Tree> buildAllTreeList() {
-    List<Tree> all = new ArrayList<>();
-
-    if (elementSyntaxList != null) {
-      all.add(elementSyntaxList.element());
-      if (elementSyntaxList.commaToken() != null) {
-        all.add(elementSyntaxList.commaToken());
-      }
-
-      SyntaxList<ValueTree> nextSyntaxList = elementSyntaxList.next();
-      while (nextSyntaxList != null) {
-        all.add(nextSyntaxList.element());
-        if (nextSyntaxList.commaToken() != null) {
-          all.add(nextSyntaxList.commaToken());
-        }
-        nextSyntaxList = nextSyntaxList.next();
-      }
-    }
-
-    return all;
+    return values != null ? values : Collections.emptyList();
   }
 
 }

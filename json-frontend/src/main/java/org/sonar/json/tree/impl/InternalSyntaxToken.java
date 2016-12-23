@@ -19,11 +19,12 @@
  */
 package org.sonar.json.tree.impl;
 
-import java.util.Iterator;
-
 import org.sonar.plugins.json.api.tree.SyntaxToken;
 import org.sonar.plugins.json.api.tree.Tree;
 import org.sonar.plugins.json.api.visitors.DoubleDispatchVisitor;
+
+import java.util.Iterator;
+import java.util.stream.Stream;
 
 public class InternalSyntaxToken extends JSONTree implements SyntaxToken {
 

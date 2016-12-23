@@ -19,29 +19,29 @@
  */
 package org.sonar.json.tree.impl;
 
+import com.google.common.base.Functions;
 import com.google.common.collect.Iterators;
+import org.sonar.plugins.json.api.tree.ObjectTree;
+import org.sonar.plugins.json.api.tree.PairTree;
+import org.sonar.plugins.json.api.tree.SyntaxToken;
+import org.sonar.plugins.json.api.tree.Tree;
+import org.sonar.plugins.json.api.visitors.DoubleDispatchVisitor;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import javax.annotation.Nullable;
-
-import org.sonar.plugins.json.api.tree.*;
-import org.sonar.plugins.json.api.visitors.DoubleDispatchVisitor;
 
 public class ObjectTreeImpl extends JSONTree implements ObjectTree {
 
   private final SyntaxToken leftBrace;
-  private final SyntaxList<PairTree> pairSyntaxList;
-  private final List<PairTree> pairs;
-  private final List<Tree> allTrees;
+  private final SeparatedList<PairTree> pairs;
   private final SyntaxToken rightBrace;
 
-  public ObjectTreeImpl(SyntaxToken leftBrace, @Nullable SyntaxList<PairTree> pairSyntaxList, SyntaxToken rightBrace) {
+  public ObjectTreeImpl(SyntaxToken leftBrace, @Nullable SeparatedList<PairTree> pairs, SyntaxToken rightBrace) {
     this.leftBrace = leftBrace;
-    this.pairSyntaxList = pairSyntaxList;
-    this.pairs = buildPairList();
-    this.allTrees = buildAllTreeList();
+    this.pairs = pairs;
     this.rightBrace = rightBrace;
   }
 
@@ -54,7 +54,7 @@ public class ObjectTreeImpl extends JSONTree implements ObjectTree {
   public Iterator<Tree> childrenIterator() {
     return Iterators.concat(
       Iterators.singletonIterator(leftBrace),
-      allTrees.iterator(),
+      pairs != null ? pairs.elementsAndSeparators(Functions.identity()) : new ArrayList<Tree>().iterator(),
       Iterators.singletonIterator(rightBrace));
   }
 
@@ -75,45 +75,7 @@ public class ObjectTreeImpl extends JSONTree implements ObjectTree {
 
   @Override
   public List<PairTree> pairs() {
-    return pairs;
-  }
-
-  private List<PairTree> buildPairList() {
-    List<PairTree> pairList = new ArrayList<>();
-
-    if (pairSyntaxList != null) {
-      pairList.add(pairSyntaxList.element());
-
-      SyntaxList<PairTree> nextSyntaxList = pairSyntaxList.next();
-      while (nextSyntaxList != null) {
-        pairList.add(nextSyntaxList.element());
-        nextSyntaxList = nextSyntaxList.next();
-      }
-    }
-
-    return pairList;
-  }
-
-  private List<Tree> buildAllTreeList() {
-    List<Tree> all = new ArrayList<>();
-
-    if (pairSyntaxList != null) {
-      all.add(pairSyntaxList.element());
-      if (pairSyntaxList.commaToken() != null) {
-        all.add(pairSyntaxList.commaToken());
-      }
-
-      SyntaxList<ValueTree> nextSyntaxList = pairSyntaxList.next();
-      while (nextSyntaxList != null) {
-        all.add(nextSyntaxList.element());
-        if (nextSyntaxList.commaToken() != null) {
-          all.add(nextSyntaxList.commaToken());
-        }
-        nextSyntaxList = nextSyntaxList.next();
-      }
-    }
-
-    return all;
+    return pairs != null ? pairs : Collections.emptyList();
   }
 
 }

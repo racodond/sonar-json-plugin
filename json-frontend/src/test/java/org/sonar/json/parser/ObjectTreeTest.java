@@ -20,67 +20,75 @@
 package org.sonar.json.parser;
 
 import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import org.junit.Test;
 import org.sonar.plugins.json.api.tree.ObjectTree;
 import org.sonar.plugins.json.api.tree.Tree;
 
+import java.io.File;
+import java.io.IOException;
+
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-public class ObjectTreeTest {
+public class ObjectTreeTest extends CommonJsonTreeTest {
+
+  public ObjectTreeTest() {
+    super(JSONLexicalGrammar.OBJECT);
+  }
 
   @Test
-  public void object() {
+  public void object() throws IOException {
     ObjectTree tree;
 
-    tree = parse("{}");
-    assertThat(tree.leftBrace()).isNotNull();
-    assertThat(tree.rightBrace()).isNotNull();
-    assertThat(tree.pairs().size()).isEqualTo(0);
+    tree = checkParsed("{}");
+    assertThat(tree.pairs()).hasSize(0);
 
-    tree = parse(" {}");
-    assertThat(tree.pairs().size()).isEqualTo(0);
+    tree = checkParsed(" {}");
+    assertThat(tree.pairs()).hasSize(0);
 
-    tree = parse("  {}");
-    assertThat(tree.pairs().size()).isEqualTo(0);
+    tree = checkParsed("  {}");
+    assertThat(tree.pairs()).hasSize(0);
 
-    tree = parse("  { }");
-    assertThat(tree.pairs().size()).isEqualTo(0);
+    tree = checkParsed("  { }");
+    assertThat(tree.pairs()).hasSize(0);
 
-    tree = parse("  {  }");
-    assertThat(tree.pairs().size()).isEqualTo(0);
+    tree = checkParsed("  {  }");
+    assertThat(tree.pairs()).hasSize(0);
 
-    tree = parse("  { \"abc\": 1 }");
-    assertThat(tree.pairs().size()).isEqualTo(1);
+    tree = checkParsed("  { \"abc\": 1 }");
+    assertThat(tree.pairs()).hasSize(1);
     assertTrue(tree.pairs().get(0).is(Tree.Kind.PAIR));
     assertThat(tree.pairs().get(0).key().actualText()).isEqualTo("abc");
     assertTrue(tree.pairs().get(0).value().value().is(Tree.Kind.NUMBER));
 
-    tree = parse("  { \"abc\": 1, \"def\": null }");
-    assertThat(tree.pairs().size()).isEqualTo(2);
+    tree = checkParsed("  { \"abc\": 1, \"def\": null }");
+    assertThat(tree.pairs()).hasSize(2);
     assertTrue(tree.pairs().get(0).is(Tree.Kind.PAIR));
     assertTrue(tree.pairs().get(1).is(Tree.Kind.PAIR));
     assertTrue(tree.pairs().get(1).value().value().is(Tree.Kind.NULL));
 
-    tree = parse(" { \"abc\": \"def\", \"zzz\" : [] }");
-    assertThat(tree.pairs().size()).isEqualTo(2);
+    tree = checkParsed(" { \"abc\": \"def\", \"zzz\" : [] }");
+    assertThat(tree.pairs()).hasSize(2);
     assertTrue(tree.pairs().get(0).is(Tree.Kind.PAIR));
     assertTrue(tree.pairs().get(1).is(Tree.Kind.PAIR));
     assertTrue(tree.pairs().get(1).value().value().is(Tree.Kind.ARRAY));
 
-    tree = parse(" { \"abc\": \"def\", \"zzz\" : {} }");
-    assertThat(tree.pairs().size()).isEqualTo(2);
+    tree = checkParsed(" { \"abc\": \"def\", \"zzz\" : {} }");
+    assertThat(tree.pairs()).hasSize(2);
     assertTrue(tree.pairs().get(0).is(Tree.Kind.PAIR));
     assertTrue(tree.pairs().get(1).is(Tree.Kind.PAIR));
     assertTrue(tree.pairs().get(1).value().value().is(Tree.Kind.OBJECT));
 
-    tree = parse(" { \"abc\": \"def\", \"zzz\" : { \"abc\": \"def\" ,\n \"zzz\" : 123 } , \"z\\\\\\\\z\\\"zz\": [ {}, {\"dd\": -12e+13} ]}");
-    assertThat(tree.pairs().size()).isEqualTo(3);
+    tree = checkParsed(" { \"abc\": \"def\", \"zzz\" : { \"abc\": \"def\" ,\n \"zzz\" : 123 } , \"z\\\\\\\\z\\\"zz\": [ {}, {\"dd\": -12e+13} ]}");
+    assertThat(tree.pairs()).hasSize(3);
     assertTrue(tree.pairs().get(0).is(Tree.Kind.PAIR));
     assertTrue(tree.pairs().get(1).is(Tree.Kind.PAIR));
     assertTrue(tree.pairs().get(2).is(Tree.Kind.PAIR));
     assertTrue(tree.pairs().get(2).value().value().is(Tree.Kind.ARRAY));
+
+    tree = checkParsed(new File("src/test/resources/many-pairs.json"));
+    assertThat(tree.pairs()).hasSize(10000);
   }
 
   @Test
@@ -90,19 +98,16 @@ public class ObjectTreeTest {
     checkNotParsed("\"{}\"");
   }
 
-  private ObjectTree parse(String toParse) {
-    return (ObjectTree) JSONParserBuilder
-      .createTestParser(Charsets.UTF_8, JSONLexicalGrammar.OBJECT)
-      .parse(toParse);
+  private ObjectTree checkParsed(String toParse) throws IOException {
+    ObjectTree tree = (ObjectTree) parser().parse(toParse);
+    assertThat(tree).isNotNull();
+    assertThat(tree.leftBrace()).isNotNull();
+    assertThat(tree.rightBrace()).isNotNull();
+    return tree;
   }
 
-  private void checkNotParsed(String toParse) {
-    try {
-      parse(toParse);
-    } catch (Exception e) {
-      return;
-    }
-    fail("Did not throw a RecognitionException as expected.");
+  private ObjectTree checkParsed(File file) throws IOException {
+    return checkParsed(Files.toString(file, Charsets.UTF_8));
   }
 
 }
