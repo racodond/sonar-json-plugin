@@ -115,6 +115,7 @@ public class JSONSquidSensor implements Sensor {
     boolean success = false;
     try {
       for (InputFile inputFile : fileSystem.inputFiles(mainFilePredicate)) {
+        LOG.debug("Analyzing " + inputFile.absolutePath() + "...");
         issues.addAll(analyzeFile(sensorContext, inputFile, treeVisitors));
         progressReport.nextFile();
       }
