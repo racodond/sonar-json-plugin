@@ -55,3 +55,28 @@ A sample plugin with detailed explanations is available [here](https://github.co
 If your custom rules may benefit the community, feel free to create a pull request in order to make the rule available in the JSON analyzer.
 
 You're thinking of new rules that may benefit the community but don't have the time or the skills to write them? Feel free to create an [issue](https://github.com/racodond/sonar-json-plugin/issues) for your rules to be taken under consideration.
+
+
+## Troubleshooting
+
+If a JSON file is containing some heavily nested objects (more than a hundred nested levels), you may face a `StackOverflowError` looking like:
+```
+Exception in thread "main" java.lang.StackOverflowError
+	at com.sonar.sslr.impl.typed.SyntaxTreeCreator.convertChildren(SyntaxTreeCreator.java:128)
+	at com.sonar.sslr.impl.typed.SyntaxTreeCreator.visitNonTerminal(SyntaxTreeCreator.java:119)
+	at com.sonar.sslr.impl.typed.SyntaxTreeCreator.visit(SyntaxTreeCreator.java:72)
+	at com.sonar.sslr.impl.typed.SyntaxTreeCreator.visitNonTerminal(SyntaxTreeCreator.java:89)
+	at com.sonar.sslr.impl.typed.SyntaxTreeCreator.visit(SyntaxTreeCreator.java:72)
+	at com.sonar.sslr.impl.typed.SyntaxTreeCreator.convertChildren(SyntaxTreeCreator.java:129)
+	at com.sonar.sslr.impl.typed.SyntaxTreeCreator.visitNonTerminal(SyntaxTreeCreator.java:119)
+	...
+```
+
+Increasing the JVM stack size should fix your issue.
+
+If you are running your analysis with:
+
+ * The SonarQube Scanner, set the `SONAR_SCANNER_OPTS` environment variable to `-Xss10m` for instance
+ * Maven, set the `MAVEN_OPTS` environment variable to `-Xss10m` for instance
+
+and rerun your analysis.
