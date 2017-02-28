@@ -1,57 +1,27 @@
-SonarQube JSON Analyzer
-=======================
-
 [![Build Status](https://api.travis-ci.org/racodond/sonar-json-plugin.svg?branch=master)](https://travis-ci.org/racodond/sonar-json-plugin)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/imfckm45thk6vvh4/branch/master?svg=true)](https://ci.appveyor.com/project/racodond/sonar-json-plugin/branch/master)
-[![Quality Gate](https://sonarqube.com/api/badges/gate?key=org.codehaus.sonar-plugins.json:json)](https://sonarqube.com/overview?id=org.codehaus.sonar-plugins.json%3Ajson)
-[![Twitter](https://img.shields.io/badge/Twitter-@racodond-blue.svg)](https://twitter.com/racodond)
+[![Quality Gate](https://sonarqube.com/api/badges/gate?key=org.codehaus.sonar-plugins.json:json)](https://sonarqube.com/dashboard?id=org.codehaus.sonar-plugins.json%3Ajson)
 
+# SonarQube JSON Analyzer
 
 ## Description
-This plugin enables code QA analysis of [JSON files](http://json.org/) within [SonarQube](http://www.sonarqube.org):
+This [SonarQube](http://www.sonarqube.org) plugin analyzes [JSON](http://json.org/) files and:
 
  * Computes metrics: lines of code, statements, etc.
- * Performs more than [12 checks](http://sonarqube.racodond.com/coding_rules#languages=json)
- * Provide the ability to write your own checks
+ * Checks various guidelines to find out potential bugs and code smells through more than [12 checks](http://sonarqube.racodond.com/coding_rules#languages=json)
+ * Provides the ability to write your own checks
 
+A live example is available [here](http://sonarqube.racodond.com/dashboard/index?id=json-sample-project).
 
-## Demo
-
- * [Demo project](http://sonarqube.racodond.com/dashboard/index?id=json-sample-project)
 
 ## Usage
 1. [Download ad install](http://docs.sonarqube.org/display/SONAR/Setup+and+Upgrade) SonarQube
-2. Install the JSON analyzer either by a [direct download](https://github.com/racodond/sonar-json-plugin/releases) or through the [Update Center](http://docs.sonarqube.org/display/SONAR/Update+Center).
-3. [Install your favorite analyzer](http://docs.sonarqube.org/display/SONAR/Analyzing+Source+Code#AnalyzingSourceCode-RunningAnalysis) (SonarQube Scanner, Maven, Ant, etc.) and analyze your code. Note that starting at version 2.0, Java 8 is required to run an analysis.
-
-Plugin versions and compatibility with SonarQube versions: [http://docs.sonarqube.org/display/PLUG/Plugin+Version+Matrix](http://docs.sonarqube.org/display/PLUG/Plugin+Version+Matrix)
-
-## Available Checks
-
-#### Generic
-
- * BOM should not be used for UTF-8 files
- * File names should comply with a naming convention
- * Files should contain an empty new line at the end
- * Tabulation characters should not be used
-
-#### Puppet
-
- * "author" should match the required value in Puppet "metadata.json" files
- * "license" should be valid in Puppet "metadata.json" files
- * "license" should match the required value in Puppet "metadata.json" files
- * "version" should be a semantic version in Puppet "metadata.json" files
- * Deprecated keys should be removed from Puppet "metadata.json" files
- * Duplicated dependencies should be removed from Puppet "metadata.json" files
- * Puppet "metadata.json" files should define all the required keys
-
-#### Templates
-
- * Regular expression on key
+1. Install the JSON plugin either by a [direct download](https://github.com/racodond/sonar-json-plugin/releases) or through the [Update Center](http://docs.sonarqube.org/display/SONAR/Update+Center). See [plugin compatibility with SonarQube versions](http://docs.sonarqube.org/display/PLUG/Plugin+Version+Matrix).
+1. [Install your favorite scanner](http://docs.sonarqube.org/display/SONAR/Analyzing+Source+Code#AnalyzingSourceCode-RunningAnalysis) (SonarQube Scanner, Maven, Ant, etc.)
+1. [Analyze your code](http://docs.sonarqube.org/display/SONAR/Analyzing+Source+Code#AnalyzingSourceCode-RunningAnalysis)
 
 
 ## Custom Checks
-
 You're thinking of new valuable rules? Version 2.0 or greater provides an API to write your own custom checks.
 A sample plugin with detailed explanations is available [here](https://github.com/racodond/sonar-json-custom-rules-plugin).
 If your custom rules may benefit the community, feel free to create a pull request in order to make the rule available in the JSON analyzer.
@@ -60,7 +30,6 @@ You're thinking of new rules that may benefit the community but don't have the t
 
 
 ## Troubleshooting
-
 If a JSON file is containing some heavily nested objects (more than a hundred nested levels), you may face a `StackOverflowError` looking like:
 ```
 Exception in thread "main" java.lang.StackOverflowError
@@ -82,3 +51,11 @@ If you are running your analysis with:
  * Maven, set the `MAVEN_OPTS` environment variable to `-Xss10m` for instance
 
 and rerun your analysis.
+
+
+## Contributing
+Any contribution is more than welcome!
+ 
+You feel like:
+* Adding a new check? Just [open an issue](https://github.com/racodond/sonar-json-plugin/issues/new) to discuss the value of your check. Once validated, code, don't forget to add a lot of unit tests and open a PR.
+* Fixing some bugs or improving existing checks? Just open a PR.
