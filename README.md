@@ -16,7 +16,7 @@ A live example is available [here](http://sonarqube.racodond.com/dashboard/index
 
 ## Usage
 1. [Download ad install](http://docs.sonarqube.org/display/SONAR/Setup+and+Upgrade) SonarQube
-1. Install the JSON plugin either by a [direct download](https://github.com/racodond/sonar-json-plugin/releases) or through the [Update Center](http://docs.sonarqube.org/display/SONAR/Update+Center). See [plugin compatibility with SonarQube versions](http://docs.sonarqube.org/display/PLUG/Plugin+Version+Matrix).
+1. [Download](https://github.com/racodond/sonar-json-plugin/releases) and install the JSON plugin. The latest version of the plugin is compatible with SonarQube 5.6+
 1. [Install your favorite scanner](http://docs.sonarqube.org/display/SONAR/Analyzing+Source+Code#AnalyzingSourceCode-RunningAnalysis) (SonarQube Scanner, Maven, Ant, etc.)
 1. [Analyze your code](http://docs.sonarqube.org/display/SONAR/Analyzing+Source+Code#AnalyzingSourceCode-RunningAnalysis)
 
