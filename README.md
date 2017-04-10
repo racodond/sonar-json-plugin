@@ -1,6 +1,5 @@
 [![Build Status](https://api.travis-ci.org/racodond/sonar-json-plugin.svg?branch=master)](https://travis-ci.org/racodond/sonar-json-plugin)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/imfckm45thk6vvh4/branch/master?svg=true)](https://ci.appveyor.com/project/racodond/sonar-json-plugin/branch/master)
-[![Quality Gate](https://sonarqube.com/api/badges/gate?key=org.codehaus.sonar-plugins.json:json)](https://sonarqube.com/dashboard?id=org.codehaus.sonar-plugins.json%3Ajson)
 
 # SonarQube JSON Analyzer
 
@@ -59,3 +58,22 @@ Any contribution is more than welcome!
 You feel like:
 * Adding a new check? Just [open an issue](https://github.com/racodond/sonar-json-plugin/issues/new) to discuss the value of your check. Once validated, code, don't forget to add a lot of unit tests and open a PR.
 * Fixing some bugs or improving existing checks? Just open a PR.
+
+
+## Available Rules
+
+### Generic
+* BOM should not be used for UTF-8 files
+* File names should comply with a naming convention
+* Files should contain an empty new line at the end
+* Regular expression on key
+* Tabulation characters should not be used
+
+### Puppet
+* "author" should match the required value in Puppet "metadata.json" files
+* "license" should be valid in Puppet "metadata.json" files
+* "license" should match the required value in Puppet "metadata.json" files
+* "version" should be a semantic version in Puppet "metadata.json" files
+* Deprecated keys should be removed from Puppet "metadata.json" files
+* Duplicated dependencies should be removed from Puppet "metadata.json" files
+* Puppet "metadata.json" files should define all the required keys
