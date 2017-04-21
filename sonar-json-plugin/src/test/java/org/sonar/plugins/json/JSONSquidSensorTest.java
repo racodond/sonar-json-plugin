@@ -20,10 +20,9 @@
 package org.sonar.plugins.json;
 
 import com.google.common.base.Charsets;
-
 import java.io.File;
 import java.util.Collection;
-
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.internal.DefaultInputFile;
@@ -137,6 +136,15 @@ public class JSONSquidSensorTest {
     createJSONSquidSensor().execute(context);
     Collection<Issue> issues = context.allIssues();
     assertThat(issues).hasSize(0);
+  }
+
+  @Ignore
+  @Test
+  public void should_not_crash_when_may_key_value_pairs() {
+    inputFile("#28-manyKeyValuePairs.json");
+
+    createJSONSquidSensor().execute(context);
+    assertThat(context.allIssues()).hasSize(0);
   }
 
   private JSONSquidSensor createJSONSquidSensor() {
