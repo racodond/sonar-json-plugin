@@ -7,7 +7,7 @@
 This [SonarQube](http://www.sonarqube.org) plugin analyzes [JSON](http://json.org/) files and:
 
  * Computes metrics: lines of code, statements, etc.
- * Checks various guidelines to find out potential bugs and code smells through more than [12 checks](http://sonarqube.racodond.com/coding_rules#languages=json)
+ * Checks various guidelines to find out potential bugs and code smells through more than [12 checks](#available-rules)
  * Provides the ability to write your own checks
 
 A live example is available [here](http://sonarqube.racodond.com/dashboard/index?id=json-sample-project).
