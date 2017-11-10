@@ -12,13 +12,11 @@ This [SonarQube](http://www.sonarqube.org) plugin analyzes [JSON](http://json.or
  * Checks various guidelines to find out potential bugs and code smells through more than [12 checks](#available-rules)
  * Provides the ability to write your own checks
 
-A live example is available [here](http://sonarqube.racodond.com/dashboard/index?id=json-sample-project).
-
 
 ## Usage
 1. [Download ad install](http://docs.sonarqube.org/display/SONAR/Setup+and+Upgrade) SonarQube
-1. [Download](https://github.com/racodond/sonar-json-plugin/releases) and install the JSON plugin. The latest version of the plugin is compatible with SonarQube 5.6+
-1. [Install your favorite scanner](http://docs.sonarqube.org/display/SONAR/Analyzing+Source+Code#AnalyzingSourceCode-RunningAnalysis) (SonarQube Scanner, Maven, Ant, etc.)
+1. Install the JSON plugin by a [direct download](https://github.com/racodond/sonar-json-plugin/releases). The latest version is compatible with SonarQube 5.6+
+1. Install your [favorite scanner](http://docs.sonarqube.org/display/SONAR/Analyzing+Source+Code#AnalyzingSourceCode-RunningAnalysis) (SonarQube Scanner, Maven, Ant, etc.)
 1. [Analyze your code](http://docs.sonarqube.org/display/SONAR/Analyzing+Source+Code#AnalyzingSourceCode-RunningAnalysis)
 
 
