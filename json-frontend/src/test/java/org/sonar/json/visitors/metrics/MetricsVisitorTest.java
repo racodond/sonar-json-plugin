@@ -20,9 +20,6 @@
 package org.sonar.json.visitors.metrics;
 
 import com.google.common.base.Charsets;
-
-import java.io.File;
-
 import org.junit.Test;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.internal.DefaultInputFile;
@@ -31,6 +28,8 @@ import org.sonar.api.measures.CoreMetrics;
 import org.sonar.json.parser.JSONParserBuilder;
 import org.sonar.plugins.json.api.tree.JsonTree;
 import org.sonar.plugins.json.api.visitors.TreeVisitorContext;
+
+import java.io.File;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -61,7 +60,6 @@ public class MetricsVisitorTest {
     String componentKey = "moduleKey:metrics.json";
     assertThat(context.measure(componentKey, CoreMetrics.NCLOC).value()).isEqualTo(6);
     assertThat(context.measure(componentKey, CoreMetrics.STATEMENTS).value()).isEqualTo(7);
-    assertThat(context.measure(componentKey, CoreMetrics.CLASSES).value()).isEqualTo(3);
   }
 
 }

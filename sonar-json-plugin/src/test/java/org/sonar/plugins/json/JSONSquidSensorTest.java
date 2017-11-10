@@ -20,10 +20,6 @@
 package org.sonar.plugins.json;
 
 import com.google.common.base.Charsets;
-
-import java.io.File;
-import java.util.Collection;
-
 import org.junit.Test;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.internal.DefaultInputFile;
@@ -40,6 +36,9 @@ import org.sonar.check.Rule;
 import org.sonar.json.checks.CheckList;
 import org.sonar.json.checks.generic.MissingNewLineAtEndOfFileCheck;
 import org.sonar.json.checks.generic.TabCharacterCheck;
+
+import java.io.File;
+import java.util.Collection;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -78,7 +77,6 @@ public class JSONSquidSensorTest {
   private void assertMeasures(String key) {
     assertThat(context.measure(key, CoreMetrics.NCLOC).value()).isEqualTo(6);
     assertThat(context.measure(key, CoreMetrics.STATEMENTS).value()).isEqualTo(7);
-    assertThat(context.measure(key, CoreMetrics.CLASSES).value()).isEqualTo(3);
   }
 
   @Test
