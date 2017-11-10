@@ -55,7 +55,7 @@ public class MetricsTest {
   public void project_measures() {
     assertThat(getProjectMeasure("lines")).isEqualTo(19);
     assertThat(getProjectMeasure("ncloc")).isEqualTo(13);
-    assertThat(getProjectMeasure("classes")).isEqualTo(7);
+    assertThat(getProjectMeasure("classes")).isNull();
     assertThat(getProjectMeasure("functions")).isNull();
     assertThat(getProjectMeasure("statements")).isEqualTo(18);
     assertThat(getProjectMeasure("files")).isEqualTo(2);
@@ -82,7 +82,7 @@ public class MetricsTest {
   public void dir_measures() {
     assertThat(getDirMeasure("lines")).isEqualTo(10);
     assertThat(getDirMeasure("ncloc")).isEqualTo(7);
-    assertThat(getDirMeasure("classes")).isEqualTo(4);
+    assertThat(getDirMeasure("classes")).isNull();
     assertThat(getDirMeasure("functions")).isNull();
     assertThat(getDirMeasure("statements")).isEqualTo(11);
     assertThat(getDirMeasure("files")).isEqualTo(1);
@@ -109,7 +109,7 @@ public class MetricsTest {
   public void file1_measures() {
     assertThat(getFile1Measure("lines")).isEqualTo(9);
     assertThat(getFile1Measure("ncloc")).isEqualTo(6);
-    assertThat(getFile1Measure("classes")).isEqualTo(3);
+    assertThat(getFile1Measure("classes")).isNull();
     assertThat(getFile1Measure("functions")).isNull();
     assertThat(getFile1Measure("statements")).isEqualTo(7);
 
@@ -133,7 +133,7 @@ public class MetricsTest {
   public void file2_measures() {
     assertThat(getFile2Measure("lines")).isEqualTo(10);
     assertThat(getFile2Measure("ncloc")).isEqualTo(7);
-    assertThat(getFile2Measure("classes")).isEqualTo(4);
+    assertThat(getFile2Measure("classes")).isNull();
     assertThat(getFile2Measure("functions")).isNull();
     assertThat(getFile2Measure("statements")).isEqualTo(11);
 

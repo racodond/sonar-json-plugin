@@ -20,10 +20,6 @@
 package org.sonar.json.visitors.metrics;
 
 import com.google.common.collect.ImmutableList;
-
-import java.io.Serializable;
-import java.util.List;
-
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.SensorContext;
@@ -31,6 +27,9 @@ import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.measures.Metric;
 import org.sonar.plugins.json.api.tree.Tree;
 import org.sonar.plugins.json.api.visitors.SubscriptionVisitor;
+
+import java.io.Serializable;
+import java.util.List;
 
 public class MetricsVisitor extends SubscriptionVisitor {
 
@@ -60,9 +59,6 @@ public class MetricsVisitor extends SubscriptionVisitor {
 
     StatementsVisitor statementsVisitor = new StatementsVisitor(tree);
     saveMetricOnFile(CoreMetrics.STATEMENTS, statementsVisitor.getNumberOfStatements());
-
-    ClassesVisitor classesVisitor = new ClassesVisitor(tree);
-    saveMetricOnFile(CoreMetrics.CLASSES, classesVisitor.getNumberOfClasses());
   }
 
   private <T extends Serializable> void saveMetricOnFile(Metric metric, T value) {

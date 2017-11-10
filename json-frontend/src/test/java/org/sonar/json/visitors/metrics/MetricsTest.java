@@ -21,12 +21,11 @@ package org.sonar.json.visitors.metrics;
 
 import com.google.common.base.Charsets;
 import com.sonar.sslr.api.typed.ActionParser;
-
-import java.io.File;
-
 import org.junit.Test;
 import org.sonar.json.parser.JSONParserBuilder;
 import org.sonar.plugins.json.api.tree.Tree;
+
+import java.io.File;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -51,7 +50,6 @@ public class MetricsTest {
   private void assertMetrics(Tree tree) {
     assertThat(new LinesOfCodeVisitor(tree).getNumberOfLinesOfCode()).isEqualTo(6);
     assertThat(new StatementsVisitor(tree).getNumberOfStatements()).isEqualTo(7);
-    assertThat(new ClassesVisitor(tree).getNumberOfClasses()).isEqualTo(3);
   }
 
 }
