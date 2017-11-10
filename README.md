@@ -52,14 +52,6 @@ If you are running your analysis with:
 and rerun your analysis.
 
 
-## Contributing
-Any contribution is more than welcome!
- 
-You feel like:
-* Adding a new check? Just [open an issue](https://github.com/racodond/sonar-json-plugin/issues/new) to discuss the value of your check. Once validated, code, don't forget to add a lot of unit tests and open a PR.
-* Fixing some bugs or improving existing checks? Just open a PR.
-
-
 ## Available Rules
 
 ### Generic
