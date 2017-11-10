@@ -1,6 +1,7 @@
 [![Build Status](https://api.travis-ci.org/racodond/sonar-json-plugin.svg?branch=master)](https://travis-ci.org/racodond/sonar-json-plugin)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/imfckm45thk6vvh4/branch/master?svg=true)](https://ci.appveyor.com/project/racodond/sonar-json-plugin/branch/master)
 [![Quality Gate status](https://sonarcloud.io/api/badges/gate?key=org.codehaus.sonar-plugins.json%3Ajson)](https://sonarcloud.io/dashboard/index/org.codehaus.sonar-plugins.json%3Ajson)
+[![Release](https://img.shields.io/github/release/racodond/sonar-json-plugin.svg)](https://github.com/racodond/sonar-json-plugin/releases/latest)
 
 # SonarQube JSON Analyzer
 
