@@ -32,4 +32,5 @@ log.txt
 *.versionsBackup
 .sonar
 .sonarlint
+.scannerwork
 sonarlint.json
