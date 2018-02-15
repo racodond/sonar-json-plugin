@@ -23,13 +23,15 @@ import com.google.common.io.Files;
 import com.sonar.orchestrator.Orchestrator;
 import com.sonar.orchestrator.build.SonarScanner;
 import com.sonar.orchestrator.locator.FileLocation;
-
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.sonarsource.analyzer.commons.ProfileGenerator;
+
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -43,8 +45,11 @@ public class JsonRulingTest {
     .build();
 
   @Before
-  public void setUp() throws Exception {
-    ProfileGenerator.generateProfile(orchestrator);
+  public void setUp() {
+    ProfileGenerator.RulesConfiguration rulesConfiguration = new ProfileGenerator.RulesConfiguration();
+    Set<String> excludedRules = Collections.emptySet();
+    File profile = ProfileGenerator.generateProfile(orchestrator.getServer().getUrl(), "json", "json", rulesConfiguration, excludedRules);
+    orchestrator.getServer().restoreProfile(FileLocation.of(profile));
   }
 
   @Test
@@ -54,8 +59,6 @@ public class JsonRulingTest {
     orchestrator.getServer().associateProjectToQualityProfile("project", "json", "rules");
     SonarScanner build = SonarScanner.create(FileLocation.of("../projects").getFile())
       .setProjectKey("project")
-      .setProjectName("project")
-      .setProjectVersion("1.0")
       .setLanguage("json")
       .setSourceDirs("./")
       .setSourceEncoding("UTF-8")
@@ -67,7 +70,7 @@ public class JsonRulingTest {
       .setProperty("sonar.cpd.skip", "true");
     orchestrator.executeBuild(build);
 
-    assertThat(Files.toString(litsDifferencesFile, StandardCharsets.UTF_8)).isEmpty();
+    assertThat(Files.asCharSource(litsDifferencesFile, StandardCharsets.UTF_8).read()).isEmpty();
   }
 
 }

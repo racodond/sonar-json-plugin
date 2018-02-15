@@ -123,13 +123,13 @@
       </dependency>
       <dependency>
         <groupId>org.sonarsource.sslr</groupId>
-        <artifactId>sslr-xpath</artifactId>
+        <artifactId>sslr-testing-harness</artifactId>
         <version>${sslr.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.sonarsource.sslr</groupId>
-        <artifactId>sslr-testing-harness</artifactId>
-        <version>${sslr.version}</version>
+        <groupId>org.sonarsource.analyzer-commons</groupId>
+        <artifactId>sonar-analyzer-commons</artifactId>
+        <version>1.5.0.178</version>
       </dependency>
       <dependency>
         <groupId>org.sonarsource.sslr-squid-bridge</groupId>
