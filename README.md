@@ -22,7 +22,7 @@ This [SonarQube](http://www.sonarqube.org) plugin analyzes [JSON](http://json.or
 
 
 ## Usage
-1. [Download ad install](http://docs.sonarqube.org/display/SONAR/Setup+and+Upgrade) SonarQube
+1. [Download and install](http://docs.sonarqube.org/display/SONAR/Setup+and+Upgrade) SonarQube
 1. Install the JSON plugin by a [direct download](https://github.com/racodond/sonar-json-plugin/releases). The latest version is compatible with SonarQube 6.7+
 1. Install your [favorite scanner](http://docs.sonarqube.org/display/SONAR/Analyzing+Source+Code#AnalyzingSourceCode-RunningAnalysis) (SonarQube Scanner, Maven, Ant, etc.)
 1. [Analyze your code](http://docs.sonarqube.org/display/SONAR/Analyzing+Source+Code#AnalyzingSourceCode-RunningAnalysis)
