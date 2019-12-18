@@ -19,27 +19,28 @@
  */
 package org.sonar.plugins.json;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 import org.junit.Test;
 import org.sonar.api.Plugin;
+import org.sonar.api.internal.SonarRuntimeImpl;
 import org.sonar.api.utils.Version;
-
-import static org.fest.assertions.Assertions.assertThat;
 
 public class JSONPluginTest {
 
-  @Test
-  public void should_get_the_right_version() {
-    Plugin.Context context = new Plugin.Context(Version.create(5, 6));
-    new JSONPlugin().define(context);
-    assertThat(context.getSonarQubeVersion().major()).isEqualTo(5);
-    assertThat(context.getSonarQubeVersion().minor()).isEqualTo(6);
-  }
+    @Test
+    public void should_get_the_right_version() {
+        Plugin.Context context = new Plugin.Context(SonarRuntimeImpl.forSonarLint(Version.create(6, 0)));
+        new JSONPlugin().define(context);
+        assertThat(context.getSonarQubeVersion().major()).isEqualTo(6);
+        assertThat(context.getSonarQubeVersion().minor()).isEqualTo(0);
+    }
 
-  @Test
-  public void should_get_the_right_number_of_extensions() {
-    Plugin.Context context = new Plugin.Context(Version.create(5, 6));
-    new JSONPlugin().define(context);
-    assertThat(context.getExtensions()).hasSize(4);
-  }
+    @Test
+    public void should_get_the_right_number_of_extensions() {
+        Plugin.Context context = new Plugin.Context(SonarRuntimeImpl.forSonarLint(Version.create(6, 0)));
+        new JSONPlugin().define(context);
+        assertThat(context.getExtensions()).hasSize(4);
+    }
 
 }
